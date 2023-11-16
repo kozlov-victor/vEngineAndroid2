@@ -4,4 +4,4 @@ window.console = {
 };
 
 console.log(2/0, window,PI);
-var getAnswer = (a)=>{return `answer is ${a}!`;};
+window.getAnswer = (a)=>{return `answer is ${new Date().getTime()} ${a}!`;};
