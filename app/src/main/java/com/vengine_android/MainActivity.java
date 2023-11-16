@@ -1,34 +1,26 @@
 package com.vengine_android;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
-import com.vengine_android.databinding.ActivityMainBinding;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Used to load the 'vengine_android' library on application startup.
     static {
         System.loadLibrary("vengine_android");
     }
 
-    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        initV8();
-        tv.setText(stringFromV8());
+        setContentView(R.layout.activity_main);
+        EngineGLSurfaceView glSurfaceView = findViewById(R.id.engine_gl_surface_view);
+        FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
-
-    public native void initV8();
-    public native String stringFromV8();
 }

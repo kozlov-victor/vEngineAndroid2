@@ -2,8 +2,8 @@
 // Created by kozlo on 11/16/2023.
 //
 
-#include "libplatform/libplatform.h"
-#include "v8.h"
+#include "headers/libplatform/libplatform.h"
+#include "headers/v8.h"
 
 
 #include <android/log.h>
@@ -79,16 +79,23 @@ jstring VEngine::getStr(JNIEnv *env) {
     context = v8::Local<v8::Context>::New(isolate, persistentContext);
     v8::Context::Scope context_scope(context);
 
-    context->Global()->Set(
+
+    v8::Local<v8::Object> nativeBridge = v8::Object::New(isolate);
+    nativeBridge->Set(
+        context,
+        v8::String::NewFromUtf8(isolate, "PRINT").ToLocalChecked(),
+        v8::Function::New(context, PRINT).ToLocalChecked()
+    );
+    nativeBridge->Set(
         context,
         v8::String::NewFromUtf8(isolate, "PI").ToLocalChecked(),
         v8::Number::New(isolate, 3.14)
     );
 
     context->Global()->Set(
-            context,
-            v8::String::NewFromUtf8(isolate, "PRINT").ToLocalChecked(),
-            v8::Function::New(context, PRINT).ToLocalChecked()
+        context,
+        v8::String::NewFromUtf8(isolate, "__nativeBridge__").ToLocalChecked(),
+        nativeBridge
     );
 
     std::string code = getJsSource(env);

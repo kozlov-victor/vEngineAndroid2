@@ -7,10 +7,10 @@
 
 #include <memory>
 
-#include "libplatform/libplatform-export.h"
-#include "libplatform/v8-tracing.h"
-#include "v8-platform.h"  // NOLINT(build/include)
-#include "v8config.h"     // NOLINT(build/include)
+#include "libplatform-export.h"
+#include "v8-tracing.h"
+#include "headers/v8-platform.h"  // NOLINT(build/include)
+#include "headers/v8config.h"     // NOLINT(build/include)
 
 namespace v8 {
 namespace platform {

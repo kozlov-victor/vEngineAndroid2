@@ -47,4 +47,4 @@ set_target_properties( v8_base PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/
 add_library( ${CMAKE_PROJECT_NAME} SHARED native-lib.cpp v_engine/VEngine.cpp)
 target_include_directories( ${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} )
 
-target_link_libraries( ${CMAKE_PROJECT_NAME} v8_base log )
+target_link_libraries( ${CMAKE_PROJECT_NAME} v8_base EGL GLESv2 log )
