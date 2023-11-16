@@ -5,6 +5,9 @@
 #ifndef VENGINEANDROID_VENGINE_H
 #define VENGINEANDROID_VENGINE_H
 
+#include <string>
+#include <jni.h>
+
 class VEngine {
 
 private:
@@ -17,7 +20,7 @@ public:
     static void log_warn(const std::string& message);
 
     void initV8();
-
+    jstring getStr(JNIEnv *env);
 };
 
 
