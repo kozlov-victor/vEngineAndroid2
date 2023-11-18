@@ -7,6 +7,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
+    private final FPSCounter fpsCounter = new FPSCounter();
+
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         VEngine.initV8();
@@ -21,5 +23,6 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl10) {
         VEngine.updateFrame();
+        fpsCounter.logFrame();
     }
 }

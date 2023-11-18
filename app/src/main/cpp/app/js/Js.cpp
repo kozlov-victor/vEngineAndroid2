@@ -9,6 +9,7 @@
 #include "headers/v8.h"
 #include "app/logger/Logger.h"
 #include "app/console/Console.h"
+#include "app/gl/Gl.h"
 
 
 const char* getJsSource(JNIEnv *env) {
@@ -63,6 +64,7 @@ void Js::compileScript(JNIEnv *env) {
     v8::Context::Scope context_scope(context_local);
 
     Console::create(&context_local);
+    Gl::create(&context_local);
 
     std::string code = getJsSource(env);
     // Create a string containing the JavaScript source code.
@@ -104,7 +106,7 @@ void Js::callFunc() {
     v8::TryCatch tryCatch(isolate);
 
     v8::Local<v8::Object> fn_value =
-            context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, "getAnswer").ToLocalChecked()).
+            context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, "_requestAnimationFrameGlobalCallBack").ToLocalChecked()).
                     ToLocalChecked().As<v8::Object>();
 
     v8::MaybeLocal<v8::Value> result =

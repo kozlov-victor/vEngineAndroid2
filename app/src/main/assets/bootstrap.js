@@ -1,13 +1,15 @@
 window = this;
+window._requestAnimationFrameGlobalCallBack = undefined;
 
-console.log('---------js----------------------');
-console.log('---------js----------------------');
-console.log('---------js----------------------');
-console.log('---------js----------------------');
-console.log('---------js----------------------');
-console.log('---------js----------------------');
+(()=>{
+    window.requestAnimationFrame = (fn)=>{
+        if (_requestAnimationFrameGlobalCallBack===undefined) _requestAnimationFrameGlobalCallBack = fn;
+    };
+})();
 
-window.getAnswer = (a)=>{
-    const val = new Date().getTime();
-    console.error(`success message! ${a} ${val}`);
-};
+requestAnimationFrame(()=>{
+    const r = Math.random();
+    _gl.clearColor(r,r,r,1.);
+    _gl.clear(_gl.COLOR_BUFFER_BIT);
+    console.log(r);
+});
