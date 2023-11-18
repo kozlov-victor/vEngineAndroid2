@@ -7,13 +7,17 @@
 
 
 #include <string>
+#include <android/log.h>
 
 class Logger {
 
-private:
-    void static log(int level, const std::string& message);
-
 public:
+    static const int LEVEL_DEBUG = ANDROID_LOG_DEBUG;
+    static const int LEVEL_INFO = ANDROID_LOG_INFO;
+    static const int LEVEL_WARN = ANDROID_LOG_WARN;
+    static const int LEVEL_ERROR = ANDROID_LOG_ERROR;
+
+    void static log(int level, const std::string& message);
     void static debug(const std::string &message);
     void static info(const std::string &message);
     void static warn(const std::string &message);
