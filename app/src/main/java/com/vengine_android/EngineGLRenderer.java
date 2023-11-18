@@ -9,21 +9,17 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-
+        VEngine.initV8();
+        VEngine.compileScriptSource();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-        VEngine.onSurfaceCreated();
-        System.out.println("-----------------------------");
-        System.out.println("-----------------------------");
-        System.out.println("-----------------------------");
-        System.out.println("-----------------------------");
-        System.out.println("---------------------->"+VEngine.getTestString());
+
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        VEngine.onDrawFrame();
+        VEngine.updateFrame();
     }
 }

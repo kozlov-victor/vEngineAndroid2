@@ -44,7 +44,10 @@ project("vengine_android")
 add_library( v8_base STATIC IMPORTED )
 set_target_properties( v8_base PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libv8.a )
 
-add_library( ${CMAKE_PROJECT_NAME} SHARED native-lib.cpp v_engine/VEngine.cpp)
+add_library(
+        ${CMAKE_PROJECT_NAME} SHARED native-lib.cpp
+        app/js/Js.cpp app/logger/Logger.cpp
+)
 target_include_directories( ${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} )
 
 target_link_libraries( ${CMAKE_PROJECT_NAME} v8_base EGL GLESv2 log )

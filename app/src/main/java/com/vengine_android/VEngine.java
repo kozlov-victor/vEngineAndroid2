@@ -39,8 +39,8 @@ public class VEngine {
         return readAsset("bootstrap.js");
     }
 
-    public static native void onSurfaceCreated();
-    public static native void onDrawFrame();
-    public static native String getTestString();
+    public static native void initV8();
+    public static native void compileScriptSource();
+    public static native void updateFrame();
 
 }
