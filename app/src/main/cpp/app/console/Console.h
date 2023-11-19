@@ -11,7 +11,7 @@
 class Console {
 
 public:
-    static void create(v8::Local<v8::Context> *context_local);
+    static void create(v8::Local<v8::Context> &context_local);
 };
 
 

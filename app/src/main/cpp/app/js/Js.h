@@ -8,6 +8,7 @@
 #include <string>
 #include "headers/libplatform/libplatform.h"
 #include "headers/v8.h"
+#include "app/js_compilation_result/JsCompilationResult.h"
 
 class Js {
 
@@ -24,7 +25,7 @@ public:
 
     Js();
     void initV8(JNIEnv *env);
-    void compileScript(JNIEnv *env);
+    JsCompilationResult compileScript(JNIEnv *env);
     void callFunc();
 };
 

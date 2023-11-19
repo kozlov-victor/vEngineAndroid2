@@ -40,7 +40,7 @@ public class VEngine {
     }
 
     public static native void initV8();
-    public static native void compileScriptSource();
+    public static native JsCompilationResult compileScriptSource();
     public static native void updateFrame();
 
 }

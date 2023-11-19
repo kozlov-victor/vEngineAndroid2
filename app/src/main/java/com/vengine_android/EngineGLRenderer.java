@@ -12,7 +12,10 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         VEngine.initV8();
-        VEngine.compileScriptSource();
+        JsCompilationResult result = VEngine.compileScriptSource();
+        if (!result.isSuccess()) {
+            throw new RuntimeException("js error: "+result.getError());
+        }
     }
 
     @Override

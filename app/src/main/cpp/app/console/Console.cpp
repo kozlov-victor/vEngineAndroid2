@@ -13,34 +13,34 @@ void log_(int level,const v8::FunctionCallbackInfo<v8::Value>& args) {
     }
 }
 
-void Console::create(v8::Local<v8::Context> *context_local) {
+void Console::create(v8::Local<v8::Context> &context_local) {
     v8::Local<v8::Object> console = v8::Object::New(isolate);
     console->Set(
-            *context_local,
+            context_local,
             v8::String::NewFromUtf8(isolate, "log").ToLocalChecked(),
-            v8::Function::New(*context_local,
+            v8::Function::New(context_local,
               [](auto args) {
                   log_(Logger::LEVEL_INFO,args);
               }).ToLocalChecked()
     );
     console->Set(
-            *context_local,
+            context_local,
             v8::String::NewFromUtf8(isolate, "error").ToLocalChecked(),
-            v8::Function::New(*context_local,
+            v8::Function::New(context_local,
             [](auto args) {
                 log_(Logger::LEVEL_ERROR,args);
             }).ToLocalChecked()
     );
     console->Set(
-            *context_local,
+            context_local,
             v8::String::NewFromUtf8(isolate, "warn").ToLocalChecked(),
-            v8::Function::New(*context_local,
+            v8::Function::New(context_local,
               [](auto args) {
                   log_(Logger::LEVEL_WARN,args);
               }).ToLocalChecked()
     );
-    (*context_local)->Global()->Set(
-            *context_local,
+    context_local->Global()->Set(
+            context_local,
             v8::String::NewFromUtf8(isolate, "console").ToLocalChecked(),
             console
     );

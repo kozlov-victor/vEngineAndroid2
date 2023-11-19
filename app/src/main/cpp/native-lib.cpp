@@ -24,9 +24,12 @@ Java_com_vengine_1android_VEngine_initV8(JNIEnv *env, jclass clazz) {
 }
 
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_vengine_1android_VEngine_compileScriptSource(JNIEnv *env, jclass clazz) {
-    js.compileScript(env);
+    JsCompilationResult result = js.compileScript(env);
+    jclass cl = env->FindClass("com/vengine_android/JsCompilationResult");
+    jmethodID cid = env->GetMethodID(cl, "<init>", "(ZLjava/lang/String;)V");
+    return env->NewObject(cl, cid, result.success,env->NewStringUTF(result.error.c_str()));
 }
 
 extern "C"
