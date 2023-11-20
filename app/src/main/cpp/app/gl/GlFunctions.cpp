@@ -30,18 +30,39 @@ GLbitfield getGlUIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, i
     return static_cast<GLuint>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
 }
 
+GLenum getGlEnumParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    return static_cast<GLenum>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+}
+
+GLintptr getGlIntPtrParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    return static_cast<GLintptr>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+}
+
+GLsizeiptr getGlSizeParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    return static_cast<GLsizeiptr>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+}
+
 char* getGlStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     v8::String::Utf8Value str(isolate, args[i]->ToString(isolate->GetCurrentContext()).ToLocalChecked());
     return *str;
 }
 
+v8::Local<v8::ArrayBuffer> getArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    if (args[i]->IsArrayBuffer()) {
+        return v8::Handle<v8::ArrayBuffer>::Cast(args[1]);
+    } else {
+        v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[1]);
+        return bufview_data->Buffer();
+    }
+}
 
-void v_activeTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    GLenum tex = static_cast<GLenum>(args[0]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+
+void activeTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum tex = getGlEnumParameter(args,0);
     glActiveTexture(tex);
 }
 
-void v_clearColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void clearColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLfloat r = getFloatParameter(args,0);
     GLfloat g = getFloatParameter(args,1);
     GLfloat b = getFloatParameter(args,2);
@@ -49,28 +70,118 @@ void v_clearColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glClearColor(r,g,b,a);
 }
 
-void v_clear(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void clear(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLbitfield mask = getBitfieldParameter(args,0);
     glClear(mask);
 }
 
-void v_attachShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void attachShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     GLuint shader = getIdFromV8GlObject(args,1);
     glAttachShader(program, shader);
 }
 
-void v_bindAttribLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void bindAttribLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     GLuint index = getGlUIntParameter(args,1);
     char* name = getGlStringParameter(args,2);
     glBindAttribLocation(program, index, name);
 }
 
-void v_bindBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void bindBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args, 0);
     GLuint buffer = getIdFromV8GlObject(args,1);
     glBindBuffer(target, buffer);
+}
+
+void bindFramebuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint target = getGlUIntParameter(args, 0);
+    GLuint buffer = getIdFromV8GlObject(args,1);
+    glBindFramebuffer(target, buffer);
+}
+
+void bindRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint target = getGlUIntParameter(args, 0);
+    GLuint buffer = getIdFromV8GlObject(args,1);
+    glBindRenderbuffer(target, buffer);
+}
+
+void bindTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint target = getGlUIntParameter(args, 0);
+    GLuint texture = getIdFromV8GlObject(args,1);
+    glBindTexture(target, texture);
+}
+
+void blendColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLfloat r = getFloatParameter(args,0);
+    GLfloat g = getFloatParameter(args,1);
+    GLfloat b = getFloatParameter(args,2);
+    GLfloat a = getFloatParameter(args,3);
+    glBlendColor(r,g,b,a);
+}
+
+void blendEquation(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum mode = getGlEnumParameter(args, 0);
+    glBlendEquation(mode);
+}
+
+void blendEquationSeparate(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum modeRGB = getGlEnumParameter(args, 0);
+    GLenum modeAlpha = getGlEnumParameter(args, 1);
+    glBlendEquationSeparate(modeRGB,modeAlpha);
+}
+
+void blendFunc(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum sfactor = getGlEnumParameter(args, 0);
+    GLenum dfactor = getGlEnumParameter(args, 1);
+    glBlendFunc(sfactor,dfactor);
+}
+
+void blendFuncSeparate(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum sfactorRGB = getGlEnumParameter(args, 0);
+    GLenum dfactorRGB = getGlEnumParameter(args, 1);
+    GLenum sfactorAlpha = getGlEnumParameter(args, 2);
+    GLenum dfactorAlpha = getGlEnumParameter(args, 3);
+    glBlendFuncSeparate(sfactorRGB,dfactorRGB,sfactorAlpha,dfactorAlpha);
+}
+
+void bufferData(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum usage = getGlEnumParameter(args,2);
+    if(args[1]->IsArrayBufferView()) {
+        v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[1]);
+        v8::Handle<v8::ArrayBuffer> buf_data = bufview_data->Buffer();
+        v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+        auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
+        void *data = con_data.Data();
+        glBufferData(target,size,data,usage);
+    } else if (args[1]->IsArrayBuffer()) {
+        v8::Handle<v8::ArrayBuffer> buf_data = v8::Handle<v8::ArrayBuffer>::Cast(args[1]);
+        v8::ArrayBuffer::Contents con_data = buf_data->GetContents();
+        auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
+        void *data = con_data.Data();
+        glBufferData(target,size,data,usage);
+    } else {
+        GLsizeiptr size = getGlSizeParameter(args,1);
+        glBufferData(target,size,NULL,usage);
+    }
+}
+
+void bufferSubData(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args, 0);
+    GLintptr offset = getGlIntPtrParameter(args, 1);
+    v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[2]);
+    v8::Handle<v8::ArrayBuffer> buf_data = bufview_data->Buffer();
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
+    void *data = con_data.Data();
+    glBufferSubData(target,offset,size,data);
+}
+
+void checkFramebufferStatus(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args, 0);
+    GLenum status = glCheckFramebufferStatus(target);
+    args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(), status));
 }
 
 struct Fun {
@@ -79,14 +190,27 @@ struct Fun {
 };
 
 void GlFunctions::create(v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
+
     std::vector<Fun> funcs = {
-        {"activeTexture", v_activeTexture},
-        {"clearColor", v_clearColor},
-        {"clear", v_clear},
-        {"attachShader", v_attachShader},
-        {"bindAttribLocation", v_bindAttribLocation},
-        {"v_bindBuffer", v_bindBuffer},
+        {"activeTexture", activeTexture},
+        {"clearColor", clearColor},
+        {"clear", clear},
+        {"attachShader", attachShader},
+        {"bindAttribLocation", bindAttribLocation},
+        {"v_bindBuffer", bindBuffer},
+        {"bindFramebuffer", bindFramebuffer},
+        {"bindRenderbuffer", bindRenderbuffer},
+        {"bindTexture", bindTexture},
+        {"blendColor", blendColor},
+        {"blendEquation", blendEquation},
+        {"blendEquationSeparate", blendEquationSeparate},
+        {"blendFunc", blendFunc},
+        {"blendFuncSeparate", blendFuncSeparate},
+        {"bufferData", bufferData},
+        {"bufferSubData", bufferSubData},
+        {"checkFramebufferStatus", checkFramebufferStatus},
     };
+
     for(const Fun& f : funcs) {
         gl->Set(
             context_local,
