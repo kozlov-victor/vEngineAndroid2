@@ -284,6 +284,40 @@ void cullFace(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glCullFace(mode);
 }
 
+void deleteRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint buffer = getIdFromV8GlObject(args,0);
+    glDeleteRenderbuffers(n,&buffer);
+}
+
+void deleteBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint buffer = getIdFromV8GlObject(args,0);
+    glDeleteBuffers(n,&buffer);
+}
+
+void deleteFramebuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint buffer = getIdFromV8GlObject(args,0);
+    glDeleteFramebuffers(n,&buffer);
+}
+
+void deleteProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    glDeleteProgram(program);
+}
+
+void deleteTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint texture = getIdFromV8GlObject(args,0);
+    glDeleteTextures(n, &texture);
+}
+
+void deleteShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint shader = getIdFromV8GlObject(args,0);
+    glDeleteShader(shader);
+}
+
 struct Fun {
     std::string name;
     void (*value)(const v8::FunctionCallbackInfo<v8::Value>&);
@@ -318,6 +352,12 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"createProgram", createProgram},
         {"createShader", createShader},
         {"cullFace", cullFace},
+        {"deleteRenderbuffer", deleteRenderbuffer},
+        {"deleteBuffer", deleteBuffer},
+        {"deleteFramebuffer", deleteFramebuffer},
+        {"deleteProgram", deleteProgram},
+        {"deleteTexture", deleteTexture},
+        {"deleteShader", deleteShader},
     };
 
     for(const Fun& f : funcs) {
