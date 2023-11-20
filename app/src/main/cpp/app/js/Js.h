@@ -19,6 +19,7 @@ public:
      * and cause a segmentation fault crash
      */
       std::unique_ptr<v8::Platform> platform;
+      v8::Isolate *isolate;
       v8::Persistent<v8::Context> persistentContext;
 
     Js();

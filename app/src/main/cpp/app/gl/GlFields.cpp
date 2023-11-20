@@ -3,7 +3,6 @@
 //
 
 #include "GlFields.h"
-#include "app/globals/globals.h"
 #include <GLES2/gl2.h>
 
 struct Field {
@@ -12,7 +11,7 @@ struct Field {
 };
 
 
-void GlFields::create(v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
+void GlFields::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
     std::vector<Field> fields =
         {
             {"UNPACK_PREMULTIPLY_ALPHA_WEBGL",            -1},

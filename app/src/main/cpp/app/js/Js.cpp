@@ -5,7 +5,6 @@
 #include <jni.h>
 
 #include <utility>
-#include "app/globals/globals.h"
 #include "Js.h"
 #include "headers/libplatform/libplatform.h"
 #include "headers/v8.h"
@@ -19,12 +18,12 @@
 const char* getJsSource(JNIEnv *env) {
     jclass clazz = env->FindClass("com/vengine_android/VEngine");
     jmethodID messageMe = env->GetStaticMethodID(clazz, "getJsSource", "()Ljava/lang/String;");
-    jstring  val = static_cast<jstring>(env->CallStaticObjectMethod(clazz, messageMe));
+    jstring val = static_cast<jstring>(env->CallStaticObjectMethod(clazz, messageMe));
     return env->GetStringUTFChars(val, NULL);
 }
 
 
-JsCompilationResult reportError(v8::TryCatch &tryCatch,v8::Local<v8::Context> &context,const std::string& error) {
+JsCompilationResult reportError(v8::Isolate *isolate,v8::TryCatch &tryCatch,v8::Local<v8::Context> &context,const std::string& error) {
     v8::String::Utf8Value e(isolate, tryCatch.Exception());
     v8::String::Utf8Value trace(isolate, tryCatch.StackTrace(context).ToLocalChecked());
     Logger::error( error );
@@ -71,10 +70,10 @@ JsCompilationResult Js::compileScript(JNIEnv *env) {
     v8::Context::Scope context_scope(context_local);
 
     // create js global objects
-    Console::create(context_local);
+    Console::create(isolate,context_local);
     v8::Local<v8::Object> gl = v8::Object::New(isolate);
-    GlFields::create(context_local,gl);
-    GlFunctions::create(context_local, gl);
+    GlFields::create(isolate,context_local,gl);
+    GlFunctions::create(isolate,context_local, gl);
     context_local->Global()->Set(
         context_local,
         v8::String::NewFromUtf8(isolate, "_gl").ToLocalChecked(),
@@ -93,13 +92,13 @@ JsCompilationResult Js::compileScript(JNIEnv *env) {
             v8::Script::Compile(context_local, source);
 
     if (script.IsEmpty()) {
-        return reportError(tryCatch,context_local,"parsing error");
+        return reportError(isolate,tryCatch,context_local,"parsing error");
     } else {
         // Run the script to get the result.
         v8::MaybeLocal<v8::Value> result = script.ToLocalChecked()->Run(context_local);
 
         if (result.IsEmpty()) {
-            return reportError(tryCatch,context_local,"evaluation error");
+            return reportError(isolate,tryCatch,context_local,"evaluation error");
         }
         else {
             Logger::info("js script compiled");
@@ -129,6 +128,6 @@ void Js::callFunc() {
     v8::MaybeLocal<v8::Value> result =
             fn_value->CallAsFunction(context_local, context_local->Global(), 1, &foo_arg);
     if (result.IsEmpty()) {
-        reportError(tryCatch,context_local,"function call error");
+        reportError(isolate,tryCatch,context_local,"function call error");
     }
 }

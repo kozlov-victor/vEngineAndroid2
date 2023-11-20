@@ -46,7 +46,6 @@ set_target_properties( v8_base PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/
 
 add_library(
         ${CMAKE_PROJECT_NAME} SHARED native-lib.cpp
-        app/globals/globals.cpp
         app/js/Js.cpp app/logger/Logger.cpp app/console/Console.cpp
         app/gl/GlFields.cpp app/gl/GlFunctions.cpp
         app/js_compilation_result/JsCompilationResult.cpp
