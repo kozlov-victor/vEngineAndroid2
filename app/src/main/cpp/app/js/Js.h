@@ -21,8 +21,6 @@ public:
       std::unique_ptr<v8::Platform> platform;
       v8::Persistent<v8::Context> persistentContext;
 
-
-
     Js();
     void initV8(JNIEnv *env);
     JsCompilationResult compileScript(JNIEnv *env);
