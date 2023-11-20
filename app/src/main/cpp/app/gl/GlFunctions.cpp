@@ -73,36 +73,26 @@ void v_bindBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glBindBuffer(target, buffer);
 }
 
+struct Fun {
+    std::string name;
+    void (*value)(const v8::FunctionCallbackInfo<v8::Value>&);
+};
+
 void GlFunctions::create(v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "activeTexture").ToLocalChecked(),
-        v8::Function::New(context_local,v_activeTexture).ToLocalChecked()
-    );
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "clearColor").ToLocalChecked(),
-        v8::Function::New(context_local,v_clearColor).ToLocalChecked()
-    );
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "clear").ToLocalChecked(),
-        v8::Function::New(context_local,v_clear).ToLocalChecked()
-    );
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "attachShader").ToLocalChecked(),
-        v8::Function::New(context_local,v_attachShader).ToLocalChecked()
-    );
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "bindAttribLocation").ToLocalChecked(),
-        v8::Function::New(context_local,v_bindAttribLocation).ToLocalChecked()
-    );
-    gl->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "bindBuffer").ToLocalChecked(),
-        v8::Function::New(context_local,v_bindBuffer).ToLocalChecked()
-    );
+    std::vector<Fun> funcs = {
+        {"activeTexture", v_activeTexture},
+        {"clearColor", v_clearColor},
+        {"clear", v_clear},
+        {"attachShader", v_attachShader},
+        {"bindAttribLocation", v_bindAttribLocation},
+        {"v_bindBuffer", v_bindBuffer},
+    };
+    for(const Fun& f : funcs) {
+        gl->Set(
+            context_local,
+            v8::String::NewFromUtf8(isolate, f.name.c_str()).ToLocalChecked(),
+            v8::Function::New(context_local,f.value).ToLocalChecked()
+        );
+    }
 
 }
