@@ -318,6 +318,16 @@ void deleteShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glDeleteShader(shader);
 }
 
+void depthFunc(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum func = getGlEnumParameter(args, 0);
+    glDepthFunc(func);
+}
+
+void depthMask(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLboolean flag = getGlBooleanParameter(args,0);
+    glDepthMask(flag);
+}
+
 struct Fun {
     std::string name;
     void (*value)(const v8::FunctionCallbackInfo<v8::Value>&);
@@ -358,6 +368,8 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"deleteProgram", deleteProgram},
         {"deleteTexture", deleteTexture},
         {"deleteShader", deleteShader},
+        {"depthFunc", depthFunc},
+        {"depthMask", depthMask},
     };
 
     for(const Fun& f : funcs) {
