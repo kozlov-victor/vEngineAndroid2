@@ -3,20 +3,9 @@
 #include "app/js/Js.h"
 
 
+v8::Local<v8::Value> emptyArray[] = { };
 Js js;
 
-//extern "C"
-//JNIEXPORT void JNICALL
-//Java_com_vengine_1android_VEngine_onSurfaceCreated(JNIEnv *env, jclass clazz) {
-//    vEngine.initV8();
-//}
-//extern "C"
-//JNIEXPORT void JNICALL
-//Java_com_vengine_1android_VEngine_onDrawFrame(JNIEnv *env, jclass clazz) {
-//    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-//    glClearColor(r,0.,1.,1.);
-//    glClear(GL_COLOR_BUFFER_BIT);
-//}
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_initV8(JNIEnv *env, jclass clazz) {
@@ -35,5 +24,5 @@ Java_com_vengine_1android_VEngine_compileScriptSource(JNIEnv *env, jclass clazz)
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_updateFrame(JNIEnv *env, jclass clazz) {
-    js.callFunc();
+    js.callFunc("_requestAnimationFrameGlobalCallBack",0,emptyArray);
 }

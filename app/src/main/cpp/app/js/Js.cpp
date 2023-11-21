@@ -18,8 +18,8 @@
 const char* getJsSource(JNIEnv *env) {
     jclass clazz = env->FindClass("com/vengine_android/VEngine");
     jmethodID messageMe = env->GetStaticMethodID(clazz, "getJsSource", "()Ljava/lang/String;");
-    jstring val = static_cast<jstring>(env->CallStaticObjectMethod(clazz, messageMe));
-    return env->GetStringUTFChars(val, NULL);
+    auto val = static_cast<jstring>(env->CallStaticObjectMethod(clazz, messageMe));
+    return env->GetStringUTFChars(val, nullptr);
 }
 
 
@@ -109,7 +109,7 @@ JsCompilationResult Js::compileScript(JNIEnv *env) {
 
 }
 
-void Js::callFunc() {
+void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[]) {
     v8::Isolate::Scope isolate_scope(isolate);
     v8::HandleScope handle_scope(isolate);
     // we have to create a local handle from the persistent handle
@@ -118,15 +118,14 @@ void Js::callFunc() {
             v8::Local<v8::Context>::New(isolate, persistentContext.Get(isolate));
     v8::Context::Scope context_scope(context_local);
 
-    v8::Local<v8::Value> foo_arg = v8::Number::New(isolate, ((float)rand())/RAND_MAX);
     v8::TryCatch tryCatch(isolate);
 
     v8::Local<v8::Object> fn_value =
-            context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, "_requestAnimationFrameGlobalCallBack").ToLocalChecked()).
+            context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, funcname).ToLocalChecked()).
                     ToLocalChecked().As<v8::Object>();
 
     v8::MaybeLocal<v8::Value> result =
-            fn_value->CallAsFunction(context_local, context_local->Global(), 1, &foo_arg);
+            fn_value->CallAsFunction(context_local, context_local->Global(), argc, argv);
     if (result.IsEmpty()) {
         reportError(isolate,tryCatch,context_local,"function call error");
     }
