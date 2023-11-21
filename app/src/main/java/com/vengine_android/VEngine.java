@@ -43,4 +43,6 @@ public class VEngine {
     public static native JsCompilationResult compileScriptSource();
     public static native void updateFrame();
 
+    public static native void dispose();
+
 }

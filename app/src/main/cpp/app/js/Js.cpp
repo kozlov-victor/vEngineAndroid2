@@ -58,6 +58,7 @@ void Js::initV8(JNIEnv *env) {
     // attach the context to the persistent context, to avoid V8 GC-ing it
     persistentContext.Reset(isolate, context);
     Logger::info("V8 is ready");
+
 }
 
 JsCompilationResult Js::compileScript(JNIEnv *env) {
@@ -129,4 +130,9 @@ void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[
     if (result.IsEmpty()) {
         reportError(isolate,tryCatch,context_local,"function call error");
     }
+}
+
+void Js::dispose() {
+    isolate->Dispose();
+    v8::V8::Dispose();
 }

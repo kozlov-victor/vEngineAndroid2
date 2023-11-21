@@ -29,7 +29,7 @@ v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::
     return obj;
 }
 
-GLfloat getFloatParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+GLfloat getGlFloatParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     v8::Isolate *isolate = args.GetIsolate();
     return static_cast<GLfloat>(args[i]->ToNumber(isolate->GetCurrentContext()).ToLocalChecked()->Value());
 }
@@ -133,10 +133,10 @@ void bindTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void blendColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    GLfloat r = getFloatParameter(args,0);
-    GLfloat g = getFloatParameter(args,1);
-    GLfloat b = getFloatParameter(args,2);
-    GLfloat a = getFloatParameter(args,3);
+    GLfloat r = getGlFloatParameter(args, 0);
+    GLfloat g = getGlFloatParameter(args, 1);
+    GLfloat b = getGlFloatParameter(args, 2);
+    GLfloat a = getGlFloatParameter(args, 3);
     glBlendColor(r,g,b,a);
 }
 
@@ -202,10 +202,10 @@ void clear(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void clearColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    GLfloat r = getFloatParameter(args,0);
-    GLfloat g = getFloatParameter(args,1);
-    GLfloat b = getFloatParameter(args,2);
-    GLfloat a = getFloatParameter(args,3);
+    GLfloat r = getGlFloatParameter(args, 0);
+    GLfloat g = getGlFloatParameter(args, 1);
+    GLfloat b = getGlFloatParameter(args, 2);
+    GLfloat a = getGlFloatParameter(args, 3);
     glClearColor(r,g,b,a);
 }
 
@@ -328,6 +328,54 @@ void depthMask(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glDepthMask(flag);
 }
 
+void depthRange(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLfloat n = getGlFloatParameter(args, 0);
+    GLfloat f = getGlFloatParameter(args, 1);
+    glDepthRangef(n,f);
+}
+
+void detachShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    GLuint shader = getIdFromV8GlObject(args,1);
+    glDetachShader(program,shader);
+}
+
+void disable(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum cap = getGlEnumParameter(args,0);
+    glDisable(cap);
+}
+
+void disableVertexAttribArray(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint index = getGlUIntParameter(args, 0);
+    glDisableVertexAttribArray(index);
+}
+
+void drawArrays(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum mode = getGlEnumParameter(args,0);
+    GLint first = getGlIntParameter(args,1);
+    GLsizei count = getGlSizeiParameter(args,2);
+    glDrawArrays(mode,first,count);
+}
+
+void drawElements(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum mode = getGlEnumParameter(args,0);
+    GLsizei count = getGlSizeiParameter(args,1);
+    GLenum type = getGlEnumParameter(args,2);
+    void *indices = (void *) getGlIntPtrParameter(args,3);
+    glDrawElements(mode,count,type,indices);
+}
+
+void enable(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum cap = getGlEnumParameter(args,0);
+    glEnable(cap);
+}
+
+void enableVertexAttribArray(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint index = getGlUIntParameter(args,0);
+    glEnableVertexAttribArray(index);
+}
+
+
 struct Fun {
     std::string name;
     void (*value)(const v8::FunctionCallbackInfo<v8::Value>&);
@@ -370,6 +418,14 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"deleteShader", deleteShader},
         {"depthFunc", depthFunc},
         {"depthMask", depthMask},
+        {"depthRange", depthRange},
+        {"detachShader", detachShader},
+        {"disable", disable},
+        {"disableVertexAttribArray", disableVertexAttribArray},
+        {"drawArrays", drawArrays},
+        {"drawElements", drawElements},
+        {"enable", enable},
+        {"enableVertexAttribArray", enableVertexAttribArray},
     };
 
     for(const Fun& f : funcs) {

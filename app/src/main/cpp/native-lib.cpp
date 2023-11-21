@@ -26,3 +26,8 @@ JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_updateFrame(JNIEnv *env, jclass clazz) {
     js.callFunc("_requestAnimationFrameGlobalCallBack",0,emptyArray);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_vengine_1android_VEngine_dispose(JNIEnv *env, jclass clazz) {
+    js.dispose();
+}

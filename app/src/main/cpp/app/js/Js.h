@@ -19,13 +19,14 @@ public:
      * and cause a segmentation fault crash
      */
       std::unique_ptr<v8::Platform> platform;
-      v8::Isolate *isolate;
+      v8::Isolate *isolate{};
       v8::Persistent<v8::Context> persistentContext;
 
     Js();
     void initV8(JNIEnv *env);
     JsCompilationResult compileScript(JNIEnv *env);
     void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]);
+    void dispose();
 };
 
 

@@ -23,4 +23,10 @@ public class MainActivity extends AppCompatActivity {
         EngineGLSurfaceView glSurfaceView = findViewById(R.id.engine_gl_surface_view);
         FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VEngine.dispose();
+    }
 }
