@@ -3,6 +3,8 @@
 //
 
 #include <jni.h>
+#include <string>
+#include <sstream>
 
 #include <utility>
 #include "Js.h"
@@ -15,21 +17,37 @@
 #include "app/js_compilation_result/JsCompilationResult.h"
 
 
-const char* getJsSource(JNIEnv *env) {
-    jclass clazz = env->FindClass("com/vengine_android/VEngine");
-    jmethodID messageMe = env->GetStaticMethodID(clazz, "getJsSource", "()Ljava/lang/String;");
-    auto val = static_cast<jstring>(env->CallStaticObjectMethod(clazz, messageMe));
-    return env->GetStringUTFChars(val, nullptr);
-}
-
-
 JsCompilationResult reportError(v8::Isolate *isolate,v8::TryCatch &tryCatch,v8::Local<v8::Context> &context,const std::string& error) {
     v8::String::Utf8Value e(isolate, tryCatch.Exception());
     v8::String::Utf8Value trace(isolate, tryCatch.StackTrace(context).ToLocalChecked());
-    Logger::error( error );
-    Logger::error( *e );
-    Logger::error( *trace );
-    JsCompilationResult result(false,error + "\n" + *e + "\n" + *trace);
+    v8::Local<v8::Message> message = tryCatch.Message();
+
+    std::stringstream ss;
+
+    ss << error << std::endl;
+    ss << *e << std::endl;
+
+    if (!message.IsEmpty()) {
+        v8::String::Utf8Value filename(isolate,message->GetScriptOrigin().ResourceName());
+        ss << "filename: " << *filename << ", ";
+        int linenum = message->GetLineNumber(context).FromJust();
+        ss << "linenum: " << linenum << ", " << std::endl;
+        v8::String::Utf8Value sourceline(isolate, message->GetSourceLine(context).ToLocalChecked());
+        ss << "sourceline: " << std::endl << *sourceline << std::endl;
+        int start = message->GetStartColumn(context).FromJust();
+        for (int i = 0; i < start; i++) {
+            ss << " ";
+        }
+        int end = message->GetEndColumn(context).FromJust();
+        for (int i = start; i < end; i++) {
+            ss << "^";
+        }
+        ss << std::endl;
+    }
+
+    Logger::error(ss.str());
+
+    JsCompilationResult result(false,ss.str());
     return result;
 }
 
@@ -37,7 +55,7 @@ Js::Js() {
 
 }
 
-void Js::initV8(JNIEnv *env) {
+void Js::initV8() {
     Logger::info("Initialize V8");
     v8::V8::InitializeICU();
     platform = v8::platform::NewDefaultPlatform();
@@ -61,7 +79,7 @@ void Js::initV8(JNIEnv *env) {
 
 }
 
-JsCompilationResult Js::compileScript(JNIEnv *env) {
+JsCompilationResult Js::compileScript(const char* fileName, const char* code) {
     Logger::info("script compiling");
     v8::Isolate::Scope isolate_scope(isolate);
     v8::HandleScope handle_scope(isolate);
@@ -81,16 +99,17 @@ JsCompilationResult Js::compileScript(JNIEnv *env) {
         gl
     );
 
-    std::string code = getJsSource(env);
     // Create a string containing the JavaScript source code.
     v8::Local<v8::String> source = v8::String::NewFromUtf8(
-            isolate, code.c_str(), v8::NewStringType::kNormal).ToLocalChecked();
+            isolate, code, v8::NewStringType::kNormal).ToLocalChecked();
 
     v8::TryCatch tryCatch(isolate);
 
     // Compile the source code.
+    v8::ScriptOrigin origin(v8::String::NewFromUtf8(isolate, fileName).ToLocalChecked());
+
     v8::MaybeLocal<v8::Script> script =
-            v8::Script::Compile(context_local, source);
+            v8::Script::Compile(context_local, source, &origin);
 
     if (script.IsEmpty()) {
         return reportError(isolate,tryCatch,context_local,"parsing error");

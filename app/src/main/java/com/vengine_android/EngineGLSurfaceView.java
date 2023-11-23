@@ -11,6 +11,7 @@ public class EngineGLSurfaceView extends GLSurfaceView {
         super(context, attributeSet);
         setEGLContextClientVersion(2);
         engineGLRenderer = new EngineGLRenderer();
+        setPreserveEGLContextOnPause(true);
         setRenderer(engineGLRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }

@@ -18,6 +18,11 @@ GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int 
         ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value();
 }
 
+std::string getStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    v8::String::Utf8Value str(args.GetIsolate(), args[i]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+    return *str;
+}
+
 v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::Value>& args,GLuint id) {
     v8::Isolate *isolate = args.GetIsolate();
     v8::Local<v8::Object> obj = v8::Object::New(isolate);
@@ -74,12 +79,6 @@ GLsizei getGlSizeiParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int
     return static_cast<GLsizei>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
 }
 
-char* getGlStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    v8::String::Utf8Value str(isolate, args[i]->ToString(isolate->GetCurrentContext()).ToLocalChecked());
-    return *str;
-}
-
 v8::Local<v8::ArrayBuffer> getArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     if (args[i]->IsArrayBuffer()) {
         return v8::Handle<v8::ArrayBuffer>::Cast(args[1]);
@@ -104,8 +103,8 @@ void attachShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
 void bindAttribLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     GLuint index = getGlUIntParameter(args,1);
-    char* name = getGlStringParameter(args,2);
-    glBindAttribLocation(program, index, name);
+    std::string name = getStringParameter(args,2);
+    glBindAttribLocation(program, index, name.c_str());
 }
 
 void bindBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -375,6 +374,196 @@ void enableVertexAttribArray(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glEnableVertexAttribArray(index);
 }
 
+void finish(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    glFinish();
+}
+
+void flush(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    glFlush();
+}
+
+void framebufferRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum attachment = getGlEnumParameter(args,1);
+    GLenum renderbuffertarget = getGlEnumParameter(args,2);
+    GLuint renderbuffer = getIdFromV8GlObject(args,3);
+    glFramebufferRenderbuffer(target,attachment,renderbuffertarget,renderbuffer);
+}
+
+void framebufferTexture2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum attachment = getGlEnumParameter(args,1);
+    GLenum textarget = getGlEnumParameter(args,2);
+    GLuint texture = getIdFromV8GlObject(args,3);
+    GLint level = getGlIntParameter(args,4);
+    glFramebufferTexture2D(target,attachment,textarget,texture,level);
+}
+
+void frontFace(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum mode = getGlEnumParameter(args,0);
+    glFrontFace(mode);
+}
+
+void generateMipmap(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    glGenerateMipmap(target);
+}
+
+void getActiveAttrib(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    GLuint index = getGlUIntParameter(args,1);
+    GLsizei bufSize = 512;
+    GLsizei length[1];
+    GLint size[1];
+    GLenum type[1];
+    GLchar name[512];
+    glGetActiveAttrib(program,index,bufSize,length,size,type,name);
+    v8::Isolate *isolate = args.GetIsolate();
+    v8::Local<v8::Object> obj = v8::Object::New(isolate);
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "size").ToLocalChecked(),
+        v8::Integer::New(isolate, size[0])
+    );
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(),
+        v8::Integer::New(isolate, type[0])
+    );
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "name").ToLocalChecked(),
+        v8::String::NewFromUtf8(isolate, name).ToLocalChecked()
+    );
+    args.GetReturnValue().Set(obj);
+}
+
+void getActiveUniform(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    GLuint index = getGlUIntParameter(args,1);
+    GLsizei bufSize = 256;
+    GLsizei length[1];
+    GLint size[1];
+    GLenum type[1];
+    GLchar name[256];
+    glGetActiveUniform(program,index,bufSize,length,size,type,name);
+    v8::Isolate *isolate = args.GetIsolate();
+    v8::Local<v8::Object> obj = v8::Object::New(isolate);
+    obj->Set(
+            isolate->GetCurrentContext(),
+            v8::String::NewFromUtf8(isolate, "size").ToLocalChecked(),
+            v8::Integer::New(isolate, size[0])
+    );
+    obj->Set(
+            isolate->GetCurrentContext(),
+            v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(),
+            v8::Integer::New(isolate, type[0])
+    );
+    obj->Set(
+            isolate->GetCurrentContext(),
+            v8::String::NewFromUtf8(isolate, "name").ToLocalChecked(),
+            v8::String::NewFromUtf8(isolate, name).ToLocalChecked()
+    );
+    args.GetReturnValue().Set(obj);
+}
+
+void getAttribLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    std::string name = getStringParameter(args,1);
+    GLint location = glGetAttribLocation(program,name.c_str());
+    args.GetReturnValue().Set(createV8GlObjectFromId(args,location));
+}
+
+void getError(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum error = glGetError();
+    args.GetReturnValue().Set(error);
+}
+
+void getFramebufferAttachmentParameteriv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum attachment = getGlEnumParameter(args,1);
+    GLenum pname = getGlEnumParameter(args,2);
+    GLint params[1];
+    glGetFramebufferAttachmentParameteriv(target,attachment,pname,params);
+    args.GetReturnValue().Set(params[0]);
+}
+
+void getParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum pname = getGlEnumParameter(args,0);
+    GLint data[1];
+    glGetIntegerv(pname,data);
+    args.GetReturnValue().Set(data[0]);
+}
+
+void createTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint textures[1];
+    glGenTextures(n,textures);
+    args.GetReturnValue().Set(createV8GlObjectFromId(args,textures[0]));
+}
+
+void getProgramInfoLog(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint program = getIdFromV8GlObject(args,0);
+    int length[1];
+    GLchar infoLog[256]; // we can use glGetProgramiv to get the precise length of the string
+    glGetProgramInfoLog(program,256,length,infoLog);
+    auto v8Str = v8::String::NewFromUtf8(args.GetIsolate(),infoLog).ToLocalChecked();
+    args.GetReturnValue().Set(v8Str);
+}
+
+void getRenderbufferParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum pname = getGlEnumParameter(args,1);
+    GLint params[1];
+    glGetRenderbufferParameteriv(target,pname,params);
+    args.GetReturnValue().Set(params[0]);
+}
+
+void getShaderInfoLog(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint shader = getIdFromV8GlObject(args,0);
+    int length[1];
+    GLchar infoLog[256];// we can use glGetShaderiv to get the precise length of the string
+    glGetShaderInfoLog(shader,256,length,infoLog);
+}
+
+void getShaderPrecisionFormat(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum shadertype = getGlEnumParameter(args,0);
+    GLenum precisiontype = getGlEnumParameter(args,1);
+    GLint range[1];
+    GLint precision[1];
+    glGetShaderPrecisionFormat(shadertype,precisiontype,range,precision);
+    v8::Isolate *isolate = args.GetIsolate();
+    v8::Local<v8::Object> obj = v8::Object::New(isolate);
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "precision").ToLocalChecked(),
+        v8::Integer::New(isolate, precision[0])
+    );
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "rangeMin").ToLocalChecked(),
+        v8::Integer::New(isolate, range[0])
+    );
+    obj->Set(
+        isolate->GetCurrentContext(),
+        v8::String::NewFromUtf8(isolate, "rangeMax").ToLocalChecked(),
+        v8::Integer::New(isolate, range[0])
+    );
+    args.GetReturnValue().Set(obj);
+}
+
+void getShaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint shader = getIdFromV8GlObject(args,0);
+//    GLsizei bufsize[1];
+//    glGetShaderiv(shader,GL_SHADER_SOURCE_LENGTH,bufsize);
+    GLsizei length[1];
+    GLchar source[512];
+    glGetShaderSource(shader,512,length,source);
+    auto v8Str = v8::String::NewFromUtf8(args.GetIsolate(),source).ToLocalChecked();
+    args.GetReturnValue().Set(v8Str);
+}
+
+
 
 struct Fun {
     std::string name;
@@ -426,6 +615,25 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"drawElements", drawElements},
         {"enable", enable},
         {"enableVertexAttribArray", enableVertexAttribArray},
+        {"finish", finish},
+        {"flush", flush},
+        {"framebufferRenderbuffer", framebufferRenderbuffer},
+        {"framebufferTexture2D", framebufferTexture2D},
+        {"frontFace", frontFace},
+        {"generateMipmap", generateMipmap},
+        {"getActiveAttrib", getActiveAttrib},
+        {"getActiveUniform", getActiveUniform},
+        {"getAttribLocation", getAttribLocation},
+        {"getError", getError},
+        {"getFramebufferAttachmentParameteriv", getFramebufferAttachmentParameteriv},
+        {"getParameter", getParameter},
+        {"createTexture", createTexture},
+        {"getProgramInfoLog", getProgramInfoLog},
+        {"getProgramInfoLog", getProgramInfoLog},
+        {"getRenderbufferParameter", getRenderbufferParameter},
+        {"getShaderInfoLog", getShaderInfoLog},
+        {"getShaderPrecisionFormat", getShaderPrecisionFormat},
+        {"getShaderSource", getShaderSource},
     };
 
     for(const Fun& f : funcs) {

@@ -35,12 +35,16 @@ public class VEngine {
         return builder.toString();
     }
 
-    public static String getJsSource() {
-        return readAsset("bootstrap.js");
+    private static String getJsSourceFromAsset(String assetFileName) {
+        return readAsset(assetFileName);
+    }
+
+    public static JsCompilationResult compileScriptFromAsset(String assetFileName) {
+        return compileScript(assetFileName, getJsSourceFromAsset(assetFileName));
     }
 
     public static native void initV8();
-    public static native JsCompilationResult compileScriptSource();
+    public static native JsCompilationResult compileScript(String fileName, String source);
     public static native void updateFrame();
 
     public static native void dispose();
