@@ -2,15 +2,19 @@
 // Created by kozlo on 11/18/2023.
 //
 
+#include <sstream>
 #include "Console.h"
 #include "../logger/Logger.h"
 
 void log_(int level,const v8::FunctionCallbackInfo<v8::Value>& args) {
     v8::Isolate *isolate = args.GetIsolate();
+    std::stringstream ss;
     for (int i=0;i<args.Length();i++) {
         v8::String::Utf8Value str(isolate, args[i]->ToString(isolate->GetCurrentContext()).ToLocalChecked());
-        Logger::log(level,*str);
+        ss << *str;
+        if (i<args.Length()-1) ss << " ";
     }
+    Logger::log(level,ss.str());
 }
 
 void Console::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local) {

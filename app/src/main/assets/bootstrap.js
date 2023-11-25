@@ -1,5 +1,5 @@
 window = this;
-window._requestAnimationFrameGlobalCallBack = undefined;
+window._requestAnimationFrameGlobalCallBack = ()=>{};
 
 (()=>{
     window.requestAnimationFrame = (fn)=>{
