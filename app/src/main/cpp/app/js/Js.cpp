@@ -14,6 +14,7 @@
 #include "app/console/Console.h"
 #include "app/gl/GlFields.h"
 #include "app/gl/GlFunctions.h"
+#include "app/external_functions/ExternalFunctions.h"
 #include "app/js_compilation_result/JsCompilationResult.h"
 
 
@@ -79,7 +80,7 @@ void Js::initV8() {
 
 }
 
-JsCompilationResult Js::compileScript(const char* fileName, const char* code) {
+JsCompilationResult Js::compileScript(JNIEnv *env,const char* fileName, const char* code) {
     Logger::info("script compiling");
     v8::Isolate::Scope isolate_scope(isolate);
     v8::HandleScope handle_scope(isolate);
@@ -89,6 +90,7 @@ JsCompilationResult Js::compileScript(const char* fileName, const char* code) {
     v8::Context::Scope context_scope(context_local);
 
     // create js global objects
+    ExternalFunctions::create(env,isolate,context_local);
     Console::create(isolate,context_local);
     v8::Local<v8::Object> gl = v8::Object::New(isolate);
     GlFields::create(isolate,context_local,gl);

@@ -3,6 +3,6 @@ window._requestAnimationFrameGlobalCallBack = ()=>{};
 
 (()=>{
     window.requestAnimationFrame = (fn)=>{
-        if (_requestAnimationFrameGlobalCallBack===undefined) _requestAnimationFrameGlobalCallBack = fn;
+        _requestAnimationFrameGlobalCallBack = fn;
     };
 })();

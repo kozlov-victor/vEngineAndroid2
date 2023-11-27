@@ -1,5 +1,6 @@
 package com.vengine_android;
 
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -35,15 +36,18 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
             System.exit(0);
         }
         VEngine.initV8();
-
         compileScriptFromAsset("bootstrap.js");
         compileScriptFromAsset("index2.js");
         surfaceAlreadyCreated = true;
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-
+    public void onSurfaceChanged(GL10 gl10, int w, int h) {
+//        GLES20.glViewport(0, 0, w, h);
+//        if (runtime!=null) {
+//            runtime.executeVoidScript(String.format("innerWidth = %d;innerHeight = %d;",width,height));
+//            runtime.executeVoidScript("_triggerEvent('resize')");
+//        }
     }
 
     @Override

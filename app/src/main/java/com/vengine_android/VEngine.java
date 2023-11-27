@@ -49,4 +49,12 @@ public class VEngine {
 
     public static native void dispose();
 
+    public static void onSurfaceWidthChanged(int width) {
+        App.surfaceResizer.setWidth(width);
+    }
+
+    public static void onSurfaceHeightChanged(int height) {
+        App.surfaceResizer.setHeight(height);
+    }
+
 }

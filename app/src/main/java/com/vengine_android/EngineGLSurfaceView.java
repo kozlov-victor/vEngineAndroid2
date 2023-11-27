@@ -6,16 +6,13 @@ import android.util.AttributeSet;
 
 public class EngineGLSurfaceView extends GLSurfaceView {
 
-    private EngineGLRenderer engineGLRenderer;
     public EngineGLSurfaceView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         setEGLContextClientVersion(2);
-        engineGLRenderer = new EngineGLRenderer();
+        App.engineGLRenderer = new EngineGLRenderer();
         setPreserveEGLContextOnPause(true);
-        setRenderer(engineGLRenderer);
+        setRenderer(App.engineGLRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
-
-    // todo destroy
 
 }

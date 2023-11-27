@@ -20,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
-        EngineGLSurfaceView glSurfaceView = findViewById(R.id.engine_gl_surface_view);
-        FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
+        App.surfaceView = findViewById(R.id.engine_gl_surface_view);
+        //FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
 
     @Override

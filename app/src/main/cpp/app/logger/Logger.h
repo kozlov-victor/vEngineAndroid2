@@ -8,6 +8,7 @@
 
 #include <string>
 #include <android/log.h>
+#include <sstream>
 
 class Logger {
 

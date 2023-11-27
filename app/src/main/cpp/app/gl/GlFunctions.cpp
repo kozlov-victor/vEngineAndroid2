@@ -8,9 +8,6 @@
 
 GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     v8::Isolate *isolate = args.GetIsolate();
-    if (args[i]->IsNull()) {
-        Logger::error("null")
-    }
     return
         args[i]->ToObject(isolate->GetCurrentContext()).ToLocalChecked()->
         Get(
@@ -266,13 +263,13 @@ void copyTexSubImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 void createBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLsizei n = 1;
-    GLuint buffer;
-    glGenBuffers(n, &buffer);
-    if (buffer==0) {
+    GLuint buffers[1];
+    glGenBuffers(n, buffers);
+    if (buffers[0] == 0) {
         args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
     } else {
-        args.GetReturnValue().Set(createV8GlObjectFromId(args,buffer));
-    };
+        args.GetReturnValue().Set(createV8GlObjectFromId(args, buffers[0]));
+    }
 }
 
 void createProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -281,7 +278,7 @@ void createProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
         args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
     } else {
         args.GetReturnValue().Set(createV8GlObjectFromId(args,program));
-    };
+    }
 }
 
 void createShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -291,7 +288,7 @@ void createShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
         args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
     } else {
         args.GetReturnValue().Set(createV8GlObjectFromId(args,shader));
-    };
+    }
 }
 
 void cullFace(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -706,6 +703,70 @@ void linkProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glLinkProgram(program);
 }
 
+void pixelStorei(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLint pname = getGlIntParameter(args,0);
+    if (pname==-1) return;
+    GLint param = getGlIntParameter(args,1);
+    glPixelStorei(pname,param);
+}
+
+void polygonOffset(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLfloat factor = getGlFloatParameter(args,0);
+    GLfloat units = getGlFloatParameter(args,1);
+    glPolygonOffset(factor,units);
+}
+
+void readPixels(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLint x = getGlIntParameter(args,0);
+    GLint y = getGlIntParameter(args,1);
+    GLsizei width = getGlSizeiParameter(args,2);
+    GLsizei height = getGlSizeiParameter(args,3);
+    GLenum format = getGlEnumParameter(args,4);
+    GLenum type = getGlEnumParameter(args,5);
+    v8::Handle<v8::ArrayBuffer> buf_data = getArrayBuffer(args,6);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    void *data = con_data.Data();
+    glReadPixels(x,y,width,height,format,type,data);
+}
+
+void createRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint buffers[1];
+    glGenRenderbuffers(n,buffers);
+    if (buffers[0]==0) {
+        args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
+    } else {
+        args.GetReturnValue().Set(createV8GlObjectFromId(args,buffers[0]));
+    }
+}
+
+void createFramebuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLsizei n = 1;
+    GLuint buffers[1];
+    glGenFramebuffers(n,buffers);
+    if (buffers[0]==0) {
+        args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
+    } else {
+        args.GetReturnValue().Set(createV8GlObjectFromId(args,buffers[0]));
+    }
+}
+
+void renderbufferStorage(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum internalformat = getGlEnumParameter(args,1);
+    GLsizei width = getGlSizeiParameter(args,2);
+    GLsizei height = getGlSizeiParameter(args,3);
+    glRenderbufferStorage(target,internalformat,width,height);
+}
+
+void sampleCoverage(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLfloat value = getGlFloatParameter(args,0);
+    GLboolean invert = getGlBooleanParameter(args,1);
+    glSampleCoverage(value,invert);
+}
+
+
+//---
 void validateProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     glValidateProgram(program);
@@ -718,12 +779,6 @@ void vertexAttribPointer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLboolean normalized = getGlBooleanParameter(args,3);
     GLsizei stride = getGlSizeiParameter(args,4);
     void *ptr = (void *) getGlIntParameter(args,5);
-    Logger::info("---vertexAttribPointer-----");
-    Logger::info(std::to_string(index));
-    Logger::info(std::to_string(size));
-    Logger::info(std::to_string(type));
-    Logger::info(std::to_string(normalized));
-    Logger::info(std::to_string(stride));
     glVertexAttribPointer(index,size,type,normalized,stride,ptr);
 }
 
@@ -732,7 +787,6 @@ void useProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glUseProgram(program);
 }
 
-//---
 void shaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint shader = getIdFromV8GlObject(args,0);
     std::string sourceCstr = getStringParameter(args,1);
@@ -831,6 +885,13 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"isTexture", isTexture},
         {"lineWidth", lineWidth},
         {"linkProgram", linkProgram},
+        {"pixelStorei", pixelStorei},
+        {"polygonOffset", polygonOffset},
+        {"readPixels", readPixels},
+        {"createRenderbuffer", createRenderbuffer},
+        {"createFramebuffer", createFramebuffer},
+        {"renderbufferStorage", renderbufferStorage},
+        {"sampleCoverage", sampleCoverage},
 
         {"validateProgram", validateProgram},
         {"vertexAttribPointer", vertexAttribPointer},

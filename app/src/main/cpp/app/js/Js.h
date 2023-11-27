@@ -24,7 +24,7 @@ public:
 
     Js();
     void initV8();
-    JsCompilationResult compileScript(const char* fileName, const char* code);
+    JsCompilationResult compileScript(JNIEnv *env,const char* fileName, const char* code);
     void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]);
     void dispose();
 };

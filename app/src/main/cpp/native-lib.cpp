@@ -25,6 +25,7 @@ Java_com_vengine_1android_VEngine_compileScript(JNIEnv *env, jclass clazz, jstri
                                                 jstring source) {
     JsCompilationResult result =
             js.compileScript(
+                    env,
                     jstring2string(env,file_name).c_str(),
                     jstring2string(env,source).c_str()
             );
