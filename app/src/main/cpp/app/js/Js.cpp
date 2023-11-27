@@ -180,4 +180,5 @@ Js::~Js() {
     v8::V8::Dispose();
     v8::V8::ShutdownPlatform();
     delete allocator;
+    delete persistentContext;
 }

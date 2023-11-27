@@ -14,9 +14,9 @@ class Js {
 
 public:
       std::unique_ptr<v8::Platform> platform;
-      v8::Isolate *isolate{};
-      v8::Persistent<v8::Context> *persistentContext{};
-      v8::ArrayBuffer::Allocator *allocator{};
+      v8::Isolate *isolate;
+      v8::Persistent<v8::Context> *persistentContext;
+      v8::ArrayBuffer::Allocator *allocator;
 
       Js();
       ~Js();

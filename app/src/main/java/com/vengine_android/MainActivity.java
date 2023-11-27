@@ -31,5 +31,6 @@ public class MainActivity extends AppCompatActivity {
         Logger.info("----activity on destroy------------");
         super.onDestroy();
         VEngine.dispose();
+        System.exit(0);
     }
 }
