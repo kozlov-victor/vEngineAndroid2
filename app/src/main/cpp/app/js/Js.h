@@ -13,20 +13,17 @@
 class Js {
 
 public:
-    /* the following references need to be around somewhere,
-     * either as global (not recommended), or in some object,
-     * otherwise they'll get garbage collected by C++
-     * and cause a segmentation fault crash
-     */
       std::unique_ptr<v8::Platform> platform;
       v8::Isolate *isolate{};
-      v8::Persistent<v8::Context> persistentContext;
+      v8::Persistent<v8::Context> *persistentContext{};
+      v8::ArrayBuffer::Allocator *allocator{};
 
-    Js();
-    void initV8();
-    JsCompilationResult compileScript(JNIEnv *env,const char* fileName, const char* code);
-    void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]);
-    void dispose();
+      Js();
+      ~Js();
+      void initV8();
+      void initGlobalObjects(JNIEnv *env) const;
+      JsCompilationResult compileScript(const char* fileName, const char* code) const;
+      void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]) const;
 };
 
 

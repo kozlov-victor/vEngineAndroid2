@@ -9,7 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     private final FPSCounter fpsCounter = new FPSCounter();
-    private boolean surfaceAlreadyCreated = false;
+    private static boolean surfaceAlreadyCreated = false;
 
     private void compileScriptFromAsset(String assetFileNAme) {
         JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileNAme);
@@ -29,10 +29,11 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+        Logger.info("------renderer on surface created----------" + this);
         if (surfaceAlreadyCreated) {
             // gl context was lost -> we can't handle that yet
             // generate contextlost event in JS?
-            System.err.println("GL context lost. Cannot restore. Exiting.");
+            Logger.error("GL context lost. Cannot restore. Exiting.");
             System.exit(0);
         }
         VEngine.initV8();
@@ -43,7 +44,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int w, int h) {
-//        GLES20.glViewport(0, 0, w, h);
+        GLES20.glViewport(0, 0, w, h);
 //        if (runtime!=null) {
 //            runtime.executeVoidScript(String.format("innerWidth = %d;innerHeight = %d;",width,height));
 //            runtime.executeVoidScript("_triggerEvent('resize')");

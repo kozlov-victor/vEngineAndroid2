@@ -9,11 +9,13 @@ public class MainActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("vengine_android");
+        Logger.info("----bin loaded---------");
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.info("----activity on create------------");
         super.onCreate(savedInstanceState);
 
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Logger.info("----activity on destroy------------");
         super.onDestroy();
         VEngine.dispose();
     }

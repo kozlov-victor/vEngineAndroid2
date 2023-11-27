@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <GLES2/gl2.h>
 #include "app/js/Js.h"
+#include "app/logger/Logger.h"
 
 std::string jstring2string(JNIEnv *env, jstring jStr){
     const char *cstr = env->GetStringUTFChars(jStr, nullptr);
@@ -9,13 +10,15 @@ std::string jstring2string(JNIEnv *env, jstring jStr){
     return str;
 }
 
-v8::Local<v8::Value> emptyArray[] = { };
-Js js;
+Js *js;
+
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_initV8(JNIEnv *env, jclass clazz) {
-    js.initV8();
+    js = new Js();
+    js->initV8();
+    js->initGlobalObjects(env);
 }
 
 
@@ -23,9 +26,9 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_vengine_1android_VEngine_compileScript(JNIEnv *env, jclass clazz, jstring file_name,
                                                 jstring source) {
+
     JsCompilationResult result =
-            js.compileScript(
-                    env,
+            js->compileScript(
                     jstring2string(env,file_name).c_str(),
                     jstring2string(env,source).c_str()
             );
@@ -37,10 +40,12 @@ Java_com_vengine_1android_VEngine_compileScript(JNIEnv *env, jclass clazz, jstri
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_updateFrame(JNIEnv *env, jclass clazz) {
-    js.callFunc("_requestAnimationFrameGlobalCallBack",0,emptyArray);
+    v8::Local<v8::Value> emptyArray[] = {};
+    js->callFunc("_requestAnimationFrameGlobalCallBack",0,emptyArray);
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_dispose(JNIEnv *env, jclass clazz) {
-    js.dispose();
+    delete js;
+    js = nullptr;
 }

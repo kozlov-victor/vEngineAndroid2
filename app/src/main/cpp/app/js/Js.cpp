@@ -53,20 +53,29 @@ JsCompilationResult reportError(v8::Isolate *isolate,v8::TryCatch &tryCatch,v8::
 }
 
 Js::Js() {
-
+    Logger::info("----Js engine created----");
 }
 
 void Js::initV8() {
     Logger::info("Initialize V8");
     v8::V8::InitializeICU();
+    Logger::info("Initialize V8 1");
     platform = v8::platform::NewDefaultPlatform();
-    v8::V8::InitializePlatform(&(*platform));
+    Logger::info("Initialize V8 2");
+    v8::V8::InitializePlatform(platform.get());
+    Logger::info("Initialize V8 2 1 ");
     v8::V8::Initialize();
+    Logger::info("Initialize V8 3");
 
     // Create a new Isolate and make it the current one.
     v8::Isolate::CreateParams create_params;
-    create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    Logger::info("Initialize V8 3 1");
+    allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    create_params.array_buffer_allocator = allocator;
+    Logger::info("Initialize V8 3 2");
     isolate = v8::Isolate::New(create_params);
+
+    Logger::info("Initialize V8 4");
 
     v8::Isolate::Scope isolate_scope(isolate);
     // Create a stack-allocated handle scope.
@@ -74,19 +83,22 @@ void Js::initV8() {
     // Create a new context.
     v8::Local<v8::Context> context = v8::Context::New(isolate);
 
+    Logger::info("Initialize V8 5");
+
     // attach the context to the persistent context, to avoid V8 GC-ing it
-    persistentContext.Reset(isolate, context);
+    persistentContext = new v8::Persistent<v8::Context>();
+    persistentContext->Reset(isolate, context);
     Logger::info("V8 is ready");
 
 }
 
-JsCompilationResult Js::compileScript(JNIEnv *env,const char* fileName, const char* code) {
-    Logger::info("script compiling");
+void Js::initGlobalObjects(JNIEnv *env) const {
+    Logger::info("init global objects");
     v8::Isolate::Scope isolate_scope(isolate);
     v8::HandleScope handle_scope(isolate);
 
     // Enter the context_local for compiling and running the hello world script.
-    v8::Local<v8::Context> context_local = v8::Local<v8::Context>::New(isolate, persistentContext);
+    v8::Local<v8::Context> context_local = v8::Local<v8::Context>::New(isolate, *persistentContext);
     v8::Context::Scope context_scope(context_local);
 
     // create js global objects
@@ -96,10 +108,20 @@ JsCompilationResult Js::compileScript(JNIEnv *env,const char* fileName, const ch
     GlFields::create(isolate,context_local,gl);
     GlFunctions::create(isolate,context_local, gl);
     context_local->Global()->Set(
-        context_local,
-        v8::String::NewFromUtf8(isolate, "_gl").ToLocalChecked(),
-        gl
+            context_local,
+            v8::String::NewFromUtf8(isolate, "_gl").ToLocalChecked(),
+            gl
     );
+}
+
+JsCompilationResult Js::compileScript(const char* fileName, const char* code) const {
+    Logger::info("script compiling");
+    v8::Isolate::Scope isolate_scope(isolate);
+    v8::HandleScope handle_scope(isolate);
+
+    // Enter the context_local for compiling and running the hello world script.
+    v8::Local<v8::Context> context_local = v8::Local<v8::Context>::New(isolate, *persistentContext);
+    v8::Context::Scope context_scope(context_local);
 
     // Create a string containing the JavaScript source code.
     v8::Local<v8::String> source = v8::String::NewFromUtf8(
@@ -131,13 +153,13 @@ JsCompilationResult Js::compileScript(JNIEnv *env,const char* fileName, const ch
 
 }
 
-void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[]) {
+void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[]) const {
     v8::Isolate::Scope isolate_scope(isolate);
     v8::HandleScope handle_scope(isolate);
     // we have to create a local handle from the persistent handle
     // every time, see process.cc example
     v8::Handle<v8::Context> context_local =
-            v8::Local<v8::Context>::New(isolate, persistentContext.Get(isolate));
+            v8::Local<v8::Context>::New(isolate, persistentContext->Get(isolate));
     v8::Context::Scope context_scope(context_local);
 
     v8::TryCatch tryCatch(isolate);
@@ -153,7 +175,9 @@ void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[
     }
 }
 
-void Js::dispose() {
+Js::~Js() {
     isolate->Dispose();
     v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
+    delete allocator;
 }
