@@ -1,17 +1,12 @@
 package com.vengine_android;
 
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
-    static {
-        System.loadLibrary("vengine_android");
-        Logger.info("----bin loaded---------");
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +18,11 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         App.surfaceView = findViewById(R.id.engine_gl_surface_view);
+        DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
+        int widthPixels = metrics.widthPixels;
+        int heightPixels = metrics.heightPixels;
+        int min = Math.min(widthPixels, heightPixels);
+        App.surfaceResizer.setSize(min,min);
         //FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
 

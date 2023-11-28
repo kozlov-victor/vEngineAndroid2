@@ -24,6 +24,11 @@ public:
     void static warn(const std::string &message);
     void static error(const std::string &message);
 
+    void static debug(const std::string &message, int val);
+    void static info(const std::string &message, int val);
+    void static warn(const std::string &message, int val);
+    void static error(const std::string &message, int val);
+
 };
 
 

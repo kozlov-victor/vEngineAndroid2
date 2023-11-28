@@ -7,6 +7,10 @@ import java.nio.charset.StandardCharsets;
 
 public class VEngine {
 
+    static {
+        System.loadLibrary("vengine_android");
+    }
+
     private static String readAsset(String fileName) {
         BufferedReader reader = null;
         StringBuilder builder = new StringBuilder();
@@ -53,8 +57,16 @@ public class VEngine {
         App.surfaceResizer.setWidth(width);
     }
 
+    public static int getSurfaceWidth() {
+        return App.surfaceResizer.getWidth();
+    }
+
     public static void onSurfaceHeightChanged(int height) {
         App.surfaceResizer.setHeight(height);
+    }
+
+    public static int getSurfaceHeight() {
+        return App.surfaceResizer.getHeight();
     }
 
 }

@@ -2,6 +2,7 @@ package com.vengine_android;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.DisplayMetrics;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -9,7 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     private final FPSCounter fpsCounter = new FPSCounter();
-    private static boolean surfaceAlreadyCreated = false;
+    private boolean surfaceAlreadyCreated = false;
 
     private void compileScriptFromAsset(String assetFileNAme) {
         JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileNAme);
@@ -36,7 +37,12 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
             Logger.error("GL context lost. Cannot restore. Exiting.");
             System.exit(0);
         }
+
+        DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
+        int widthPixels = metrics.widthPixels;
+        int heightPixels = metrics.heightPixels;
         VEngine.initV8();
+        compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
         compileScriptFromAsset("bootstrap.js");
         compileScriptFromAsset("index2.js");
         surfaceAlreadyCreated = true;

@@ -104,13 +104,13 @@ void Js::initGlobalObjects(JNIEnv *env) const {
     // create js global objects
     ExternalFunctions::create(env,isolate,context_local);
     Console::create(isolate,context_local);
-    v8::Local<v8::Object> gl = v8::Object::New(isolate);
-    GlFields::create(isolate,context_local,gl);
-    GlFunctions::create(isolate,context_local, gl);
+    v8::Local<v8::Object> globalGL = v8::Object::New(isolate);
+    GlFields::create(isolate, context_local, globalGL);
+    GlFunctions::create(isolate, context_local, globalGL);
     context_local->Global()->Set(
             context_local,
-            v8::String::NewFromUtf8(isolate, "_gl").ToLocalChecked(),
-            gl
+            v8::String::NewFromUtf8(isolate, "_globalGL").ToLocalChecked(),
+            globalGL
     );
 }
 

@@ -40,8 +40,8 @@ Java_com_vengine_1android_VEngine_compileScript(JNIEnv *env, jclass clazz, jstri
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_VEngine_updateFrame(JNIEnv *env, jclass clazz) {
-    v8::Local<v8::Value> emptyArray[] = {};
-    js->callFunc("_requestAnimationFrameGlobalCallBack",0,emptyArray);
+    v8::Local<v8::Value> args[] = {};
+    js->callFunc("_requestAnimationFrameGlobalCallBack",0,args);
 }
 extern "C"
 JNIEXPORT void JNICALL

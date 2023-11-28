@@ -8,6 +8,9 @@
 
 GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     v8::Isolate *isolate = args.GetIsolate();
+    if (args[i]->IsNull()) {
+        return 0;
+    }
     return
         args[i]->ToObject(isolate->GetCurrentContext()).ToLocalChecked()->
         Get(
@@ -86,10 +89,16 @@ GLsizei getGlSizeiParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int
 
 v8::Local<v8::ArrayBuffer> getArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     if (args[i]->IsArrayBuffer()) {
-        return v8::Handle<v8::ArrayBuffer>::Cast(args[1]);
-    } else {
-        v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[1]);
+        return v8::Handle<v8::ArrayBuffer>::Cast(args[i]);
+    } else if (args[i]->IsArrayBufferView()){
+        v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[i]);
         return bufview_data->Buffer();
+    } else {
+        Logger::error("argument is not an array buffer");
+        v8::String::Utf8Value str(args.GetIsolate(), args[i]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+        Logger::error(*str);
+        raise(42);
+        return {};
     }
 }
 
@@ -630,7 +639,7 @@ void getUniformLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     std::string name = getStringParameter(args,1);
     GLint location = glGetUniformLocation(program,name.c_str());
-    args.GetReturnValue().Set(location);
+    args.GetReturnValue().Set(createV8GlObjectFromId(args,location));
 }
 
 void getVertexAttrib(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -765,8 +774,79 @@ void sampleCoverage(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glSampleCoverage(value,invert);
 }
 
+void scissor(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLint x = getGlIntParameter(args,0);
+    GLint y = getGlIntParameter(args,1);
+    GLsizei width = getGlSizeiParameter(args,2);
+    GLsizei height = getGlSizeiParameter(args,3);
+    glScissor(x,y,width,height);
+}
 
-//---
+void shaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint shader = getIdFromV8GlObject(args,0);
+    std::string sourceCstr = getStringParameter(args,1);
+    const auto *source = (const GLchar *)sourceCstr.c_str();
+    GLsizei count = 1;
+    GLint length[1] = {-1};
+    glShaderSource(shader,count,&source, length);
+}
+
+void stencilFunc(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum func = getGlEnumParameter(args,0);
+    GLint ref = getGlIntParameter(args,1);
+    GLuint mask = getGlUIntParameter(args,2);
+    glStencilFunc(func,ref,mask);
+}
+
+void stencilFuncSeparate(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum face = getGlEnumParameter(args,0);
+    GLenum func = getGlEnumParameter(args,1);
+    GLint ref = getGlIntParameter(args,2);
+    GLuint mask = getGlUIntParameter(args,3);
+    glStencilFuncSeparate(face,func,ref,mask);
+}
+
+void stencilMask(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLuint mask = getGlUIntParameter(args,0);
+    glStencilMask(mask);
+}
+
+void stencilMaskSeparate(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum face = getGlEnumParameter(args,0);
+    GLuint mask = getGlEnumParameter(args,1);
+    glStencilMaskSeparate(face,mask);
+}
+
+void stencilOp(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum fail = getGlEnumParameter(args,0);
+    GLenum zfail = getGlEnumParameter(args,1);
+    GLenum zpass = getGlEnumParameter(args,2);
+    glStencilOp(fail,zfail,zpass);
+}
+
+void stencilOpSeparate(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum face = getGlEnumParameter(args,0);
+    GLenum sfail = getGlEnumParameter(args,1);
+    GLenum dpfail = getGlEnumParameter(args,2);
+    GLenum dppass = getGlEnumParameter(args,3);
+    glStencilOpSeparate(face,sfail,dpfail,dppass);
+}
+
+void texParameterf(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum pname = getGlEnumParameter(args,1);
+    GLfloat param = getGlFloatParameter(args,2);
+    glTexParameterf(target,pname,param);
+}
+
+void viewport(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLint x = getGlIntParameter(args,0);
+    GLint y = getGlIntParameter(args,1);
+    GLsizei width = getGlSizeiParameter(args,2);
+    GLsizei height = getGlSizeiParameter(args,3);
+    glViewport(x,y,width,height);
+}
+
 void validateProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     glValidateProgram(program);
@@ -787,15 +867,210 @@ void useProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glUseProgram(program);
 }
 
-void shaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    GLuint shader = getIdFromV8GlObject(args,0);
-    std::string sourceCstr = getStringParameter(args,1);
-    const auto *source = (const GLchar *)sourceCstr.c_str();
-    GLsizei count = 1;
-    GLint length[1] = {-1};
-    glShaderSource(shader,count,&source, length);
+void texParameteri(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLenum pname = getGlEnumParameter(args,1);
+    GLint param =  getGlIntParameter(args,2);
+    glTexParameteri(target,pname,param);
 }
 
+void uniform1f(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLfloat v0 = getGlFloatParameter(args,1);
+    glUniform1f(location,v0);
+}
+
+void uniform1fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4);
+    void *data = con_data.Data();
+    glUniform1fv(location,size,(const GLfloat *)data);
+}
+
+void uniform1i(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLint v0 = getGlIntParameter(args,1);
+    glUniform1i(location,v0);
+}
+
+void uniform1iv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4);
+    void *data = con_data.Data();
+    glUniform1iv(location,size,(const GLint *)data);
+}
+
+void uniform2f(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLfloat v0 = getGlFloatParameter(args,1);
+    GLfloat v1 = getGlFloatParameter(args,2);
+    glUniform2f(location,v0,v1);
+}
+
+void uniform2fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 2);
+    void *data = con_data.Data();
+    glUniform2fv(location,size,(const GLfloat *)data);
+}
+
+void uniform2i(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLint v0 = getGlIntParameter(args,1);
+    GLint v1 = getGlIntParameter(args,2);
+    glUniform2i(location,v0,v1);
+}
+
+void uniform2iv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 2);
+    void *data = con_data.Data();
+    glUniform2iv(location,size,(const GLint*)data);
+}
+
+void uniform3f(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLfloat v0 = getGlFloatParameter(args,1);
+    GLfloat v1 = getGlFloatParameter(args,2);
+    GLfloat v2 = getGlFloatParameter(args,3);
+    glUniform3f(location,v0,v1,v2);
+}
+
+void uniform3fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 3);
+    void *data = con_data.Data();
+    glUniform3fv(location,size,(const GLfloat *)data);
+}
+
+void uniform3i(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLint v0 = getGlIntParameter(args,1);
+    GLint v1 = getGlIntParameter(args,2);
+    GLint v2 = getGlIntParameter(args,3);
+    glUniform3i(location,v0,v1,v2);
+}
+
+void uniform3iv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 3);
+    void *data = con_data.Data();
+    glUniform3iv(location,size,(const GLint*)data);
+}
+
+void uniform4f(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLfloat v0 = getGlFloatParameter(args,1);
+    GLfloat v1 = getGlFloatParameter(args,2);
+    GLfloat v2 = getGlFloatParameter(args,3);
+    GLfloat v3 = getGlFloatParameter(args,4);
+    glUniform4f(location,v0,v1,v2,v3);
+}
+
+void uniform4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 4);
+    void *data = con_data.Data();
+    glUniform4fv(location,size,(const GLfloat *)data);
+}
+
+void uniform4i(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLint v0 = getGlIntParameter(args,1);
+    GLint v1 = getGlIntParameter(args,2);
+    GLint v2 = getGlIntParameter(args,3);
+    GLint v3 = getGlIntParameter(args,4);
+    glUniform4i(location,v0,v1,v2,v3);
+}
+
+void uniform4iv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    auto buf_data = getArrayBuffer(args,1);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / 4);
+    void *data = con_data.Data();
+    glUniform4iv(location,size,(const GLint*)data);
+}
+
+void uniformMatrix2fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLboolean transpose = getGlBooleanParameter(args,1);
+    auto buf_data = getArrayBuffer(args,2);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / (2*2));
+    void *data = con_data.Data();
+    glUniformMatrix2fv(location,size,transpose,(const GLfloat *)data);
+}
+
+void uniformMatrix3fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLboolean transpose = getGlBooleanParameter(args,1);
+    auto buf_data = getArrayBuffer(args,2);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / (3*3));
+    void *data = con_data.Data();
+    glUniformMatrix3fv(location,size,transpose,(const GLfloat *)data);
+}
+
+void uniformMatrix4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    auto location = static_cast<GLint>(getIdFromV8GlObject(args,0));
+    GLboolean transpose = getGlBooleanParameter(args,1);
+    auto buf_data = getArrayBuffer(args,2);
+    v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+    auto size = static_cast<GLsizeiptr>(con_data.ByteLength() / 4 / (4*4));
+    void *data = con_data.Data();
+    glUniformMatrix4fv(location,size,transpose,(const GLfloat *)data);
+}
+
+void texImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLenum target = getGlEnumParameter(args,0);
+    GLint level = getGlIntParameter(args,1);
+    GLint internalformat = getGlIntParameter(args,2);
+    GLsizei width = getGlSizeiParameter(args,3);
+    GLsizei height = getGlSizeiParameter(args,4);
+    GLint border = getGlIntParameter(args,5);
+    GLenum format = getGlEnumParameter(args,6);
+    GLenum type = getGlEnumParameter(args,7);
+
+    Logger::info("texImage2D");
+    Logger::info("argsize",args.Length());
+
+    if (args[8]->IsNull()) { // todo
+        auto *pixels = (void *)calloc(4,width*height);
+        glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
+    } else {
+        auto buf_data = getArrayBuffer(args,8);
+        Logger::info("texImage2D",1);
+        v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
+        Logger::info("texImage2D",2);
+        auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
+        auto *data = (GLubyte *)con_data.Data();
+        Logger::info("texImage2D",3);
+
+//        auto *pixels = new GLubyte[size];
+//        for (unsigned j = 0; j < size; j++) {
+//            pixels[j] = data[j];
+//        }
+        Logger::info("texImage2D",4);
+        glTexImage2D(target,level,internalformat,width,height,border,format,type,data);
+        Logger::info("texImage2D",5);
+        //delete[] pixels;
+    }
+}
 
 struct Fun {
     std::string name;
@@ -892,11 +1167,42 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"createFramebuffer", createFramebuffer},
         {"renderbufferStorage", renderbufferStorage},
         {"sampleCoverage", sampleCoverage},
-
+        {"scissor", scissor},
+        {"shaderSource", shaderSource},
+        {"stencilFunc", stencilFunc},
+        {"stencilFuncSeparate", stencilFuncSeparate},
+        {"stencilMask", stencilMask},
+        {"stencilMaskSeparate", stencilMaskSeparate},
+        {"stencilOp", stencilOp},
+        {"stencilOpSeparate", stencilOpSeparate},
+        {"texParameterf", texParameterf},
+        {"viewport", viewport},
         {"validateProgram", validateProgram},
         {"vertexAttribPointer", vertexAttribPointer},
         {"useProgram", useProgram},
         {"shaderSource", shaderSource},
+        {"texParameteri", texParameteri},
+        {"uniform1f", uniform1f},
+        {"uniform1fv", uniform1fv},
+        {"uniform1i", uniform1i},
+        {"uniform1iv", uniform1iv},
+        {"uniform2f", uniform2f},
+        {"uniform2fv", uniform2fv},
+        {"uniform2i", uniform2i},
+        {"uniform2iv", uniform2iv},
+        {"uniform3f", uniform3f},
+        {"uniform3fv", uniform3fv},
+        {"uniform3i", uniform3i},
+        {"uniform3iv", uniform3iv},
+        {"uniform4f", uniform4f},
+        {"uniform4fv", uniform4fv},
+        {"uniform4i", uniform4i},
+        {"uniform4iv", uniform4iv},
+        {"uniformMatrix2fv", uniformMatrix2fv},
+        {"uniformMatrix3fv", uniformMatrix3fv},
+        {"uniformMatrix4fv", uniformMatrix4fv},
+        {"texImage2D", texImage2D},
+
     };
 
     for(const Fun& f : funcs) {
