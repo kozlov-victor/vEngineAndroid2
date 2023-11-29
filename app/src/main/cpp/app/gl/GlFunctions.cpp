@@ -1036,7 +1036,8 @@ void uniformMatrix4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glUniformMatrix4fv(location,size,transpose,(const GLfloat *)data);
 }
 
-void texImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
+
+void texImage2D_9_(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum target = getGlEnumParameter(args,0);
     GLint level = getGlIntParameter(args,1);
     GLint internalformat = getGlIntParameter(args,2);
@@ -1046,30 +1047,27 @@ void texImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum format = getGlEnumParameter(args,6);
     GLenum type = getGlEnumParameter(args,7);
 
-    Logger::info("texImage2D");
-    Logger::info("argsize",args.Length());
-
-    if (args[8]->IsNull()) { // todo
+    if (args[8]->IsNull()) {
         auto *pixels = (void *)calloc(4,width*height);
         glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
     } else {
         auto buf_data = getArrayBuffer(args,8);
-        Logger::info("texImage2D",1);
         v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
-        Logger::info("texImage2D",2);
         auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
         auto *data = (GLubyte *)con_data.Data();
-        Logger::info("texImage2D",3);
 
-//        auto *pixels = new GLubyte[size];
-//        for (unsigned j = 0; j < size; j++) {
-//            pixels[j] = data[j];
-//        }
-        Logger::info("texImage2D",4);
         glTexImage2D(target,level,internalformat,width,height,border,format,type,data);
-        Logger::info("texImage2D",5);
-        //delete[] pixels;
+
     }
+}
+
+void texImage2D_6_(const v8::FunctionCallbackInfo<v8::Value>& args) {
+
+}
+
+void texImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    if (args.Length()==9) texImage2D_9_(args);
+    else texImage2D_6_(args);
 }
 
 struct Fun {

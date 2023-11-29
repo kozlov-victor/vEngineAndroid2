@@ -1,8 +1,10 @@
-package com.vengine_android;
+package com.vengine_android.utils;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.view.ViewGroup;
+
+import com.vengine_android.app.App;
 
 
 public class SurfaceResizer {
@@ -20,6 +22,7 @@ public class SurfaceResizer {
     }
 
     public void setSize(final int width, final int height){
+        if (width==0) throw new RuntimeException("0");
         new Handler(Looper.getMainLooper()).post(()->{
             ViewGroup.LayoutParams params = App.surfaceView.getLayoutParams();
             if (width!=-1) params.width = width;

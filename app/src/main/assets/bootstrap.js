@@ -1,29 +1,51 @@
 window = this;
 window._requestAnimationFrameGlobalCallBack = ()=>{};
 
-const glNameByName = {};
-Object.keys(_globalGL).forEach(key=>{
-    glNameByName[_globalGL[key]] = key;
-});
-
-Object.keys(_globalGL).forEach(key=>{
-    const orig = _globalGL[key];
-    if (typeof _globalGL[key]!=='function') return;
-    if (key==='getError') return;
-    _globalGL[key] = (...args)=>{
-        const result = orig(...args);
-        if (_globalGL.getError()!==0) {
-            const argsDebug = [];
-            args.forEach(arg=>{
-                argsDebug.push(glNameByName[arg]||arg);
-            });
-            throw new Error(`error invocation ${key} with args ${argsDebug} (${args})`);
-        }
-        return result;
-    }
-});
+//const glNameByName = {};
+//Object.keys(_globalGL).forEach(key=>{
+//    glNameByName[_globalGL[key]] = key;
+//});
+//
+//Object.keys(_globalGL).forEach(key=>{
+//    const orig = _globalGL[key];
+//    if (typeof _globalGL[key]!=='function') return;
+//    if (key==='getError') return;
+//    _globalGL[key] = (...args)=>{
+//        const result = orig(...args);
+//        if (_globalGL.getError()!==0) {
+//            const argsDebug = [];
+//            args.forEach(arg=>{
+//                argsDebug.push(glNameByName[arg]||arg);
+//            });
+//            throw new Error(`error invocation ${key} with args ${argsDebug} (${args})`);
+//        }
+//        return result;
+//    }
+//});
 
 (()=>{
+
+    class TaskQueue {
+
+        constructor(){
+            this._tasks = [];
+        }
+
+        addNextTask(fn) {
+            this._tasks.push(fn);
+        }
+
+        drain() {
+            for (const t of tasks) {
+                t();
+            }
+            this.tasks.length = 0;
+        }
+
+    }
+
+    window._taskQueue = new TaskQueue();
+    window._drainTaskQueue = ()=>window._taskQueue.drain();
 
     class CanvasStyle {
 
@@ -32,7 +54,7 @@ Object.keys(_globalGL).forEach(key=>{
         }
 
         set width(val){
-            _external.setSurfaceWidth(val);
+            _external.setSurfaceWidth(parseInt(val));
         }
 
         get width(){
@@ -40,7 +62,7 @@ Object.keys(_globalGL).forEach(key=>{
         }
 
         set height(val){
-            _external.setSurfaceHeight(val);
+            _external.setSurfaceHeight(parseInt(val));
         }
 
         get height(){

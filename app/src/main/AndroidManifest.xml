@@ -11,11 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VEngineAndroid"
-        android:name=".App"
+        android:name=".app.App"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
-            android:launchMode="singleInstance"
+            android:name=".app.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true">
             <intent-filter>

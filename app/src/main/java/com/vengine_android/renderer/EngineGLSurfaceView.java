@@ -1,8 +1,10 @@
-package com.vengine_android;
+package com.vengine_android.renderer;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+
+import com.vengine_android.app.App;
 
 public class EngineGLSurfaceView extends GLSurfaceView {
 

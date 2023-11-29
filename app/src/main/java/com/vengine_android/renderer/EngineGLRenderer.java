@@ -1,8 +1,14 @@
-package com.vengine_android;
+package com.vengine_android.renderer;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.DisplayMetrics;
+
+import com.vengine_android.utils.FPSCounter;
+import com.vengine_android.app.JsCompilationResult;
+import com.vengine_android.utils.Logger;
+import com.vengine_android.engine.VEngine;
+import com.vengine_android.app.App;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -44,7 +50,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         VEngine.initV8();
         compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
         compileScriptFromAsset("bootstrap.js");
-        compileScriptFromAsset("index2.js");
+        compileScriptFromAsset("index1.js");
         surfaceAlreadyCreated = true;
     }
 

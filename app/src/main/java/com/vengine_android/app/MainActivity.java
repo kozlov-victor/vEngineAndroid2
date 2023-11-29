@@ -1,10 +1,13 @@
-package com.vengine_android;
+package com.vengine_android.app;
 
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.vengine_android.utils.Logger;
+import com.vengine_android.R;
+import com.vengine_android.engine.VEngine;
 
 public class MainActivity extends AppCompatActivity {
 
