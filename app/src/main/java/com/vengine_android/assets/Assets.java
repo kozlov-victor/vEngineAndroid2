@@ -12,8 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Assets {
+
+    private final Map<Integer,Bitmap> bitmapCache = new HashMap<>();
 
     private String processLocalUrl(String url){
         if (url.startsWith("./")) url = url.replace("./","");
@@ -54,16 +58,27 @@ public class Assets {
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
-    public Bitmap loadBitmap(String fileName) {
+    public int loadBitmap(String fileName) {
         fileName = processLocalUrl(fileName);
-        if (fileName.startsWith("data:image") && fileName.contains(",")) return convertString64ToImage(fileName.split(",")[1]);
+        Bitmap bitmap;
+        if (fileName.startsWith("data:image") && fileName.contains(",")) {
+            bitmap = convertString64ToImage(fileName.split(",")[1]);
+        }
         else {
             try(InputStream inputStream = App.getContext().getAssets().open(fileName)) {
-                return BitmapFactory.decodeStream(inputStream);
+                bitmap = BitmapFactory.decodeStream(inputStream);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                return 0;
             }
         }
+        int key = bitmapCache.size() + 1;
+        bitmapCache.put(key,bitmap);
+        return key;
+    }
+
+    public Bitmap getCachedBitmap(int id) {
+        return bitmapCache.get(id);
     }
 
 

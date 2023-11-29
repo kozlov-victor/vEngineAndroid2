@@ -3,6 +3,7 @@
 //
 
 #include <jni.h>
+#include <GLES2/gl2.h>
 #include "ExternalFunctions.h"
 #include "app/logger/Logger.h"
 
@@ -51,7 +52,31 @@ void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::C
                 args.GetReturnValue().Set(height);
             }).ToLocalChecked()
     );
-
+    ext->Set(
+            context_local,
+            v8::String::NewFromUtf8(isolate, "_loadBitmap").ToLocalChecked(),
+            v8::Function::New(context_local, [](auto args){
+                jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
+                jmethodID m = envClosure->GetStaticMethodID(cl, "loadBitmap", "(Ljava/lang/String;)I");
+                v8::String::Utf8Value str(args.GetIsolate(), args[0]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+                jstring jStr = envClosure->NewStringUTF(*str);
+                jint bitmapId = envClosure->CallStaticIntMethod(cl, m, jStr);
+                args.GetReturnValue().Set(bitmapId);
+            }).ToLocalChecked()
+    );
+    ext->Set(
+            context_local,
+            v8::String::NewFromUtf8(isolate, "_texImage2D_6").ToLocalChecked(),
+            v8::Function::New(context_local, [](auto args){
+                auto isolate = args.GetIsolate();
+                int target = args[0]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value();
+                int level = args[1]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value();
+                int bitmap = args[5]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value();
+                jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
+                jmethodID m = envClosure->GetStaticMethodID(cl, "getBitmap", "(III)V");
+                envClosure->CallStaticVoidMethod(cl,m,target,level,bitmap);
+            }).ToLocalChecked()
+    );
     context_local->Global()->Set(
             context_local,
             v8::String::NewFromUtf8(isolate, "_external").ToLocalChecked(),

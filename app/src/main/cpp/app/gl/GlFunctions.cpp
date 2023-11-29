@@ -227,6 +227,11 @@ void clearStencil(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glClearStencil(s);
 }
 
+void clearDepth(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    GLfloat s = getGlFloatParameter(args,0);
+    glClearDepthf(s);
+}
+
 void colorMask(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLboolean r = getGlBooleanParameter(args,0);
     GLboolean g = getGlBooleanParameter(args,1);
@@ -1037,7 +1042,7 @@ void uniformMatrix4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 
-void texImage2D_9_(const v8::FunctionCallbackInfo<v8::Value>& args) {
+void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum target = getGlEnumParameter(args,0);
     GLint level = getGlIntParameter(args,1);
     GLint internalformat = getGlIntParameter(args,2);
@@ -1059,15 +1064,6 @@ void texImage2D_9_(const v8::FunctionCallbackInfo<v8::Value>& args) {
         glTexImage2D(target,level,internalformat,width,height,border,format,type,data);
 
     }
-}
-
-void texImage2D_6_(const v8::FunctionCallbackInfo<v8::Value>& args) {
-
-}
-
-void texImage2D(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    if (args.Length()==9) texImage2D_9_(args);
-    else texImage2D_6_(args);
 }
 
 struct Fun {
@@ -1096,6 +1092,7 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"clear", clear},
         {"clearColor", clearColor},
         {"clearStencil", clearStencil},
+        {"clearDepth", clearDepth},
         {"colorMask", colorMask},
         {"compileShader", compileShader},
         {"copyTexImage2D", copyTexImage2D},
@@ -1199,7 +1196,7 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"uniformMatrix2fv", uniformMatrix2fv},
         {"uniformMatrix3fv", uniformMatrix3fv},
         {"uniformMatrix4fv", uniformMatrix4fv},
-        {"texImage2D", texImage2D},
+        {"_texImage2D_9", texImage2D_9},
 
     };
 

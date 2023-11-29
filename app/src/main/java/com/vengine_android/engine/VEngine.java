@@ -1,5 +1,7 @@
 package com.vengine_android.engine;
 
+import android.opengl.GLUtils;
+
 import com.vengine_android.app.App;
 import com.vengine_android.app.JsCompilationResult;
 
@@ -37,6 +39,16 @@ public class VEngine {
     @JniAccess
     public static int getSurfaceHeight() {
         return App.surfaceResizer.getHeight();
+    }
+
+    @JniAccess
+    public static int loadBitmap(String fileName) {
+        return App.assets.loadBitmap(fileName);
+    }
+
+    @JniAccess
+    public static void getBitmap(int target, int level ,int bitmap) {
+        GLUtils.texImage2D(target,level,App.assets.getCachedBitmap(bitmap),0);
     }
 
 }

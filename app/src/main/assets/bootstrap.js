@@ -1,5 +1,21 @@
 window = this;
 window._requestAnimationFrameGlobalCallBack = ()=>{};
+window._nextTick = ()=>{
+    window._requestAnimationFrameGlobalCallBack(Date.now());
+    window._taskQueue.drain();
+};
+
+
+_globalGL.texImage2D = (...args)=>{
+    if (args.length===9) {
+        _globalGL._texImage2D_9(...args);
+    }
+    else if (args.length===6) {
+        args[5] = args[5]._bitmap.$id;
+        _external._texImage2D_6(...args);
+    }
+    else throw new Error('wrong arguments for texImage2D invocation');
+}
 
 //const glNameByName = {};
 //Object.keys(_globalGL).forEach(key=>{
@@ -36,10 +52,10 @@ window._requestAnimationFrameGlobalCallBack = ()=>{};
         }
 
         drain() {
-            for (const t of tasks) {
+            for (const t of this._tasks) {
                 t();
             }
-            this.tasks.length = 0;
+            this._tasks.length = 0;
         }
 
     }
@@ -103,6 +119,44 @@ window._requestAnimationFrameGlobalCallBack = ()=>{};
             return this.style.height;
         }
     }
+
+    class Image {
+
+        constructor(){
+            this._src = null;
+            this._onload = null;
+            this.onerror = null;
+            this.width = 0;
+            this.height = 0;
+        }
+
+        set src(val){
+            this._src = val;
+            _taskQueue.addNextTask(()=>{
+                console.log('loading image data',this._src);
+                const bitmapId = _external._loadBitmap(val);
+                if (bitmapId!==0) {
+                    this._bitmap = {$id:bitmapId};
+                    this._onload && this._onload();
+                }
+                else this.onerror && this.onerror();
+            });
+        }
+
+        get src(){
+            return this._src;
+        }
+
+        set onload(cb) {
+            this._onload = cb;
+        }
+
+        get onload(){
+            return this._onload;
+        }
+
+    }
+    window.Image = Image;
 
     const globalCanvas = new Canvas();
     _globalGL.canvas = globalCanvas;

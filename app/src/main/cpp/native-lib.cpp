@@ -41,7 +41,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_vengine_1android_engine_VEngine_updateFrame(JNIEnv *env, jclass clazz) {
     v8::Local<v8::Value> args[] = {};
-    js->callFunc("_requestAnimationFrameGlobalCallBack",0,args);
+    js->callFunc("_nextTick",0,args);
 }
 extern "C"
 JNIEXPORT void JNICALL
