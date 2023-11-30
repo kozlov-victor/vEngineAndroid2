@@ -2,6 +2,8 @@ package com.vengine_android.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Looper;
+import android.widget.Toast;
 
 import com.vengine_android.assets.Assets;
 import com.vengine_android.renderer.EngineGLRenderer;
@@ -29,5 +31,15 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         sApplication = this;
+        Thread.setDefaultUncaughtExceptionHandler((Thread th, Throwable e)->{
+            new Thread() {
+                @Override
+                public void run() {
+                    Looper.prepare();
+                    Toast.makeText(sApplication,e.getMessage(),Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                }
+            }.start();
+        });
     }
 }

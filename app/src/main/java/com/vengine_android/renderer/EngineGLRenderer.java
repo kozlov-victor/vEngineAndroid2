@@ -18,8 +18,8 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     private final FPSCounter fpsCounter = new FPSCounter();
     private boolean surfaceAlreadyCreated = false;
 
-    private void compileScriptFromAsset(String assetFileNAme) {
-        JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileNAme);
+    private void compileScriptFromAsset(String assetFileName) {
+        JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileName);
         if (!result.isSuccess()) {
             VEngine.dispose();
             throw new RuntimeException("js error: \n"+result.getError());
@@ -50,7 +50,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         VEngine.initV8();
         compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
         compileScriptFromAsset("bootstrap.js");
-        compileScriptFromAsset("index7.js");
+        compileScriptFromAsset("index2.js");
         surfaceAlreadyCreated = true;
     }
 
