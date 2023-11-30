@@ -21,7 +21,7 @@ void Console::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local)
     v8::Local<v8::Object> console = v8::Object::New(isolate);
     console->Set(
             context_local,
-            v8::String::NewFromUtf8(isolate, "log").ToLocalChecked(),
+            v8::String::NewFromUtf8(isolate, "_log").ToLocalChecked(),
             v8::Function::New(context_local,
               [](auto args) {
                   log_(Logger::LEVEL_INFO,args);
@@ -29,7 +29,7 @@ void Console::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local)
     );
     console->Set(
             context_local,
-            v8::String::NewFromUtf8(isolate, "error").ToLocalChecked(),
+            v8::String::NewFromUtf8(isolate, "_error").ToLocalChecked(),
             v8::Function::New(context_local,
             [](auto args) {
                 log_(Logger::LEVEL_ERROR,args);
@@ -37,7 +37,7 @@ void Console::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local)
     );
     console->Set(
             context_local,
-            v8::String::NewFromUtf8(isolate, "warn").ToLocalChecked(),
+            v8::String::NewFromUtf8(isolate, "_warn").ToLocalChecked(),
             v8::Function::New(context_local,
               [](auto args) {
                   log_(Logger::LEVEL_WARN,args);

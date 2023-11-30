@@ -41,6 +41,24 @@ _globalGL.texImage2D = (...args)=>{
 
 (()=>{
 
+    const _prepareLogArgs = (args)=>{
+        const arr = [];
+        for (let a of args) {
+            try {
+                if (a?.apply) arr.push(""+a);
+                else arr.push(JSON.stringify(a));
+            }
+            catch(e){
+                arr.push(""+a);
+            }
+        }
+        return arr;
+    }
+
+    console.log = (...args)=>console._log(..._prepareLogArgs(args));
+    console.error = (...args)=>console._error(..._prepareLogArgs(args));
+    console.warn = (...args)=>console._warn(..._prepareLogArgs(args));
+
     class TaskQueue {
 
         constructor(){
@@ -104,7 +122,7 @@ _globalGL.texImage2D = (...args)=>{
         addEventListener(){
         }
         set width(val){
-            this.style.width = val;
+            //this.style.width = val;
         }
 
         get width(){
@@ -112,7 +130,7 @@ _globalGL.texImage2D = (...args)=>{
         }
 
         set height(val){
-            this.style.height = val;
+            //this.style.height = val;
         }
 
         get height(){
@@ -133,10 +151,12 @@ _globalGL.texImage2D = (...args)=>{
         set src(val){
             this._src = val;
             _taskQueue.addNextTask(()=>{
-                console.log('loading image data',this._src);
                 const bitmapId = _external._loadBitmap(val);
                 if (bitmapId!==0) {
                     this._bitmap = {$id:bitmapId};
+                    // todo width height
+                    this.width = 100;
+                    this.height = 100;
                     this._onload && this._onload();
                 }
                 else this.onerror && this.onerror();
@@ -182,6 +202,47 @@ _globalGL.texImage2D = (...args)=>{
         addEventListener(){
         }
     }
+
+    class XMLHttpRequest {
+
+        constructor() {
+            this.status = 0;
+            this.url = '';
+        }
+
+        setRequestHeader(){
+
+        }
+
+        open(method,url){
+            this.url = url;
+        }
+
+        send(){
+            const currUrl = this.url.split('?')[0];
+            const successCallback = (resp)=>{
+                this.readyState = 4;
+                this.status = 200;
+                this.response = resp;
+                if (resp && resp.toUpperCase) this.responseText = resp;
+                this.onload && this.onload();
+                this.onreadystatechange && this.onreadystatechange();
+            };
+            const errorCallback = (e)=>{
+                console.error(e);
+            };
+            _taskQueue.addNextTask(()=>{ // todo
+                (this.responseType==='blob' || this.responseType==='arraybuffer')?
+                    _files.loadAssetAsBinary(currUrl,successCallback,errorCallback):
+                    _files.loadAssetAsString(currUrl,successCallback,errorCallback);
+            });
+        }
+
+        getResponseHeader(){
+
+        }
+
+    };
 
     window.document = new Document();
     window.navigator = {
