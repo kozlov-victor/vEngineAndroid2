@@ -59,31 +59,21 @@ Js::Js() {
 void Js::initV8() {
     Logger::info("Initialize V8");
     v8::V8::InitializeICU();
-    Logger::info("Initialize V8 1");
     platform = v8::platform::NewDefaultPlatform();
-    Logger::info("Initialize V8 2");
     v8::V8::InitializePlatform(platform.get());
-    Logger::info("Initialize V8 2 1 ");
     v8::V8::Initialize();
-    Logger::info("Initialize V8 3");
 
     // Create a new Isolate and make it the current one.
     v8::Isolate::CreateParams create_params;
-    Logger::info("Initialize V8 3 1");
     allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
     create_params.array_buffer_allocator = allocator;
-    Logger::info("Initialize V8 3 2");
     isolate = v8::Isolate::New(create_params);
-
-    Logger::info("Initialize V8 4");
 
     v8::Isolate::Scope isolate_scope(isolate);
     // Create a stack-allocated handle scope.
     v8::HandleScope handle_scope(isolate);
     // Create a new context.
     v8::Local<v8::Context> context = v8::Context::New(isolate);
-
-    Logger::info("Initialize V8 5");
 
     // attach the context to the persistent context, to avoid V8 GC-ing it
     persistentContext = new v8::Persistent<v8::Context>();
