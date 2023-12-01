@@ -6,98 +6,132 @@
 #include <GLES2/gl2.h>
 #include "app/logger/Logger.h"
 
-GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    if (args[i]->IsNull()) {
+GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int index) {
+    v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(args[index]);
+    v8::Local<v8::String> idKey = v8::String::NewFromUtf8(args.GetIsolate(), "$id", v8::NewStringType::kInternalized).ToLocalChecked();
+
+    if (obj->HasOwnProperty(args.GetIsolate()->GetCurrentContext(), idKey).FromMaybe(false)) {
+        v8::Local<v8::Value> idValue = obj->Get(args.GetIsolate()->GetCurrentContext(), idKey).ToLocalChecked();
+        v8::MaybeLocal<v8::Uint32> maybeId = idValue->ToUint32(args.GetIsolate()->GetCurrentContext());
+        if (!maybeId.IsEmpty()) {
+            return maybeId.ToLocalChecked()->Value();
+        } else {
+            Logger::error("Can not convert $id to Uint32.");
+            return 0;
+        }
+    } else {
+        Logger::error("no $id key in object");
         return 0;
     }
-    return
-        args[i]->ToObject(isolate->GetCurrentContext()).ToLocalChecked()->
-        Get(
-            isolate->GetCurrentContext(),
-            v8::String::NewFromUtf8(isolate, "$id").ToLocalChecked()
-        ).ToLocalChecked()->
-        ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value();
 }
 
-std::string getStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::String::Utf8Value str(args.GetIsolate(), args[i]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
-    return *str;
+std::string getStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int index) {
+    if (index < 0 || index >= args.Length()) {
+        Logger::error("bad parameter index",index);
+        return "";
+    }
+    v8::Local<v8::Value> value = args[index];
+    if (value->IsString()) {
+        v8::String::Utf8Value str(args.GetIsolate(), value);
+        return {*str};
+    } else {
+        Logger::error("not a string");
+        return "";
+    }
 }
 
-v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::Value>& args,GLuint id) {
-    v8::Isolate *isolate = args.GetIsolate();
+v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::Value>& args, GLuint id) {
+    v8::Isolate* isolate = args.GetIsolate();
+    v8::Local<v8::Context> context = isolate->GetCurrentContext();
     v8::Local<v8::Object> obj = v8::Object::New(isolate);
-    obj->Set(
-        isolate->GetCurrentContext(),
-        v8::String::NewFromUtf8(isolate, "$id").ToLocalChecked(),
-        v8::Integer::New(isolate, id)
-    );
+
+    v8::Local<v8::String> idKey = v8::String::NewFromUtf8(isolate, "$id", v8::NewStringType::kInternalized).ToLocalChecked();
+    v8::Local<v8::Value> idValue = v8::Integer::NewFromUnsigned(isolate, id);
+    obj->Set(context, idKey, idValue).Check();
+
     return obj;
 }
 
+template <typename T>
+T getParameter_(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    v8::Isolate* isolate = args.GetIsolate();
+    if (i < 0 || i >= args.Length()) {
+        Logger::error("wrong parameter index",i);
+        return T();
+    }
+    v8::Local<v8::Value> value = args[i];
+    if (!value->IsNumber()) {
+        Logger::error("not a numeric parameter");
+        return T();
+    }
+    return static_cast<T>(value->ToNumber(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+}
+
 GLfloat getGlFloatParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLfloat>(args[i]->ToNumber(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLfloat>(args, i);
 }
 
 GLbitfield getBitfieldParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLbitfield>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLbitfield>(args, i);
 }
 
 GLuint getGlUIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLuint>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLuint>(args, i);
 }
 
 GLint getGlIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLint>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLint>(args, i);
 }
 
-GLboolean getGlBooleanParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) { // todo check type conversion?
-    v8::Isolate *isolate = args.GetIsolate();
-    if (args[i]->IsBoolean()) {
-        bool value = args[i]->ToBoolean(isolate)->Value();
-        GLboolean res = value?1:0;
-        return res;
+GLboolean getGlBooleanParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    v8::Isolate* isolate = args.GetIsolate();
+    v8::Local<v8::Value> value = args[i];
+    if (value->IsBoolean()) {
+        return static_cast<GLboolean>(value->BooleanValue(isolate));
+    } else if (value->IsNumber()) {
+        int intValue = value->ToInt32(isolate->GetCurrentContext()).ToLocalChecked()->Value();
+        return static_cast<GLboolean>(intValue != 0);
     } else {
-        return static_cast<GLboolean>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+        Logger::error("parameter neither boolean not number");
+        return GL_FALSE;
     }
 }
 
 GLenum getGlEnumParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLenum>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLenum>(args, i);
 }
 
 GLintptr getGlIntPtrParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLintptr>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLintptr>(args, i);
 }
 
 GLsizeiptr getGlSizeParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLsizeiptr>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLsizeiptr>(args, i);
 }
 
 GLsizei getGlSizeiParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate *isolate = args.GetIsolate();
-    return static_cast<GLsizei>(args[i]->ToInteger(isolate->GetCurrentContext()).ToLocalChecked()->Value());
+    return getParameter_<GLsizei>(args, i);
 }
 
 v8::Local<v8::ArrayBuffer> getArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    if (args[i]->IsArrayBuffer()) {
-        return v8::Handle<v8::ArrayBuffer>::Cast(args[i]);
-    } else if (args[i]->IsArrayBufferView()){
-        v8::Handle<v8::ArrayBufferView> bufview_data = v8::Handle<v8::ArrayBufferView>::Cast(args[i]);
-        return bufview_data->Buffer();
+    v8::Isolate* isolate = args.GetIsolate();
+    if (i < 0 || i >= args.Length()) {
+        Logger::error("wrong index");
+        return {};
+    }
+    v8::Local<v8::Value> arg = args[i];
+    if (arg->IsArrayBuffer()) {
+        return arg.As<v8::ArrayBuffer>();
+    } else if (arg->IsArrayBufferView()) {
+        v8::Local<v8::ArrayBufferView> bufView = arg.As<v8::ArrayBufferView>();
+        return bufView->Buffer();
+    } else if (arg->IsTypedArray()) {
+        v8::Local<v8::TypedArray> typedArray = arg.As<v8::TypedArray>();
+        return typedArray->Buffer();
     } else {
-        Logger::error("argument is not an array buffer");
-        v8::String::Utf8Value str(args.GetIsolate(), args[i]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+        Logger::error("neither an ArrayBuffer not ArrayBufferView not TypedArray.");
+        v8::String::Utf8Value str(isolate, arg->ToString(isolate->GetCurrentContext()).ToLocalChecked());
         Logger::error(*str);
-        raise(42);
         return {};
     }
 }
@@ -206,7 +240,7 @@ void bufferSubData(const v8::FunctionCallbackInfo<v8::Value>& args) {
 void checkFramebufferStatus(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum target = getGlEnumParameter(args, 0);
     GLenum status = glCheckFramebufferStatus(target);
-    args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(), status));
+    args.GetReturnValue().Set(v8::Integer::NewFromUnsigned(args.GetIsolate(), status));
 }
 
 void clear(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -451,17 +485,17 @@ void getActiveAttrib(const v8::FunctionCallbackInfo<v8::Value>& args) {
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "size").ToLocalChecked(),
         v8::Integer::New(isolate, size[0])
-    );
+    ).Check();
     obj->Set(
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(),
-        v8::Integer::New(isolate, type[0])
-    );
+        v8::Integer::NewFromUnsigned(isolate, type[0])
+    ).Check();
     obj->Set(
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "name").ToLocalChecked(),
         v8::String::NewFromUtf8(isolate, name).ToLocalChecked()
-    );
+    ).Check();
     args.GetReturnValue().Set(obj);
 }
 
@@ -480,17 +514,17 @@ void getActiveUniform(const v8::FunctionCallbackInfo<v8::Value>& args) {
             isolate->GetCurrentContext(),
             v8::String::NewFromUtf8(isolate, "size").ToLocalChecked(),
             v8::Integer::New(isolate, size[0])
-    );
+    ).Check();
     obj->Set(
             isolate->GetCurrentContext(),
             v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(),
-            v8::Integer::New(isolate, type[0])
-    );
+            v8::Integer::NewFromUnsigned(isolate, type[0])
+    ).Check();
     obj->Set(
             isolate->GetCurrentContext(),
             v8::String::NewFromUtf8(isolate, "name").ToLocalChecked(),
             v8::String::NewFromUtf8(isolate, name).ToLocalChecked()
-    );
+    ).Check();
     args.GetReturnValue().Set(obj);
 }
 
@@ -575,17 +609,17 @@ void getShaderPrecisionFormat(const v8::FunctionCallbackInfo<v8::Value>& args) {
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "precision").ToLocalChecked(),
         v8::Integer::New(isolate, precision[0])
-    );
+    ).Check();
     obj->Set(
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "rangeMin").ToLocalChecked(),
         v8::Integer::New(isolate, range[0])
-    );
+    ).Check();
     obj->Set(
         isolate->GetCurrentContext(),
         v8::String::NewFromUtf8(isolate, "rangeMax").ToLocalChecked(),
         v8::Integer::New(isolate, range[0])
-    );
+    ).Check();
     args.GetReturnValue().Set(obj);
 }
 
@@ -1163,7 +1197,6 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
         {"renderbufferStorage", renderbufferStorage},
         {"sampleCoverage", sampleCoverage},
         {"scissor", scissor},
-        {"shaderSource", shaderSource},
         {"stencilFunc", stencilFunc},
         {"stencilFuncSeparate", stencilFuncSeparate},
         {"stencilMask", stencilMask},
@@ -1205,7 +1238,7 @@ void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_lo
             context_local,
             v8::String::NewFromUtf8(isolate, f.name.c_str()).ToLocalChecked(),
             v8::Function::New(context_local,f.value).ToLocalChecked()
-        );
+        ).Check();
     }
 
 }

@@ -25,7 +25,7 @@ var fragmentShaderText =
 ].join('\n');
 
 var InitDemo = function () {
-	console.log('This is working');
+	console.log('it`s working');
 
 	var canvas = document.getElementById('game-surface');
 	var gl = canvas.getContext('webgl');
@@ -48,8 +48,12 @@ var InitDemo = function () {
 	var vertexShader = gl.createShader(gl.VERTEX_SHADER);
 	var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
+    console.log('will invoke vertexShader shader source',vertexShader, vertexShaderText);
 	gl.shaderSource(vertexShader, vertexShaderText);
+	console.log('will invoke fragmentShader shader source',fragmentShader, fragmentShaderText);
 	gl.shaderSource(fragmentShader, fragmentShaderText);
+
+
 
 	gl.compileShader(vertexShader);
 	if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
@@ -117,10 +121,10 @@ var InitDemo = function () {
 	// Main render loop
 	//
 
-//	requestAnimationFrame(()=>{
-//	    gl.useProgram(program);
-//        gl.drawArrays(gl.TRIANGLES, 0, 3);
-//	});
+	requestAnimationFrame(()=>{
+	    gl.useProgram(program);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+	});
 
 	gl.useProgram(program);
 	gl.drawArrays(gl.TRIANGLES, 0, 3);

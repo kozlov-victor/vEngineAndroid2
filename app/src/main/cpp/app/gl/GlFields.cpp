@@ -325,6 +325,6 @@ void GlFields::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local
                 context_local,
                 v8::String::NewFromUtf8(isolate, f.name.c_str()).ToLocalChecked(),
                 v8::Number::New(isolate, f.value)
-        );
+        ).Check();
     }
 }

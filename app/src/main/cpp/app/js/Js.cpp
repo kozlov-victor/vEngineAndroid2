@@ -111,7 +111,7 @@ void Js::initGlobalObjects(JNIEnv *env) const {
             context_local,
             v8::String::NewFromUtf8(isolate, "_globalGL").ToLocalChecked(),
             globalGL
-    );
+    ).Check();
 }
 
 JsCompilationResult Js::compileScript(const char* fileName, const char* code) const {
