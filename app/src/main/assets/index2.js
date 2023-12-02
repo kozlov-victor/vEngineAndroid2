@@ -97,6 +97,8 @@ var InitDemo = function () {
 
 	var positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
 	var colorAttribLocation = gl.getAttribLocation(program, 'vertColor');
+	console.log({positionAttribLocation});
+	console.log({colorAttribLocation});
 	gl.vertexAttribPointer(
 		positionAttribLocation, // Attribute location
 		2, // Number of elements per attribute

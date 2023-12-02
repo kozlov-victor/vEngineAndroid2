@@ -27,17 +27,22 @@ GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int 
 
 std::string getStringParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int index) {
     if (index < 0 || index >= args.Length()) {
-        Logger::error("bad parameter index",index);
+        Logger::error("bad parameter index", index);
         return "";
     }
+
     v8::Local<v8::Value> value = args[index];
-    if (value->IsString()) {
-        v8::String::Utf8Value str(args.GetIsolate(), value);
-        return {*str};
-    } else {
-        Logger::error("not a string");
+    v8::Local<v8::Context> context = args.GetIsolate()->GetCurrentContext();
+
+    v8::Local<v8::String> stringValue;
+    if (!value->ToString(context).ToLocal(&stringValue)) {
+        Logger::error("failed to convert to string");
         return "";
     }
+
+    v8::String::Utf8Value utf8Value(args.GetIsolate(), stringValue);
+    const char* strData = *utf8Value;
+    return {strData};
 }
 
 v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::Value>& args, GLuint id) {
@@ -532,7 +537,7 @@ void getAttribLocation(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     std::string name = getStringParameter(args,1);
     GLint location = glGetAttribLocation(program,name.c_str());
-    args.GetReturnValue().Set(location);
+    args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(),location));
 }
 
 void getError(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -575,9 +580,9 @@ void getProgramInfoLog(const v8::FunctionCallbackInfo<v8::Value>& args) {
 void getProgramParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint program = getIdFromV8GlObject(args,0);
     GLenum pname = getGlEnumParameter(args,1);
-    GLint params[1];
-    glGetProgramiv(program,pname,params);
-    args.GetReturnValue().Set(params[0]);
+    GLint param;
+    glGetProgramiv(program,pname,&param);
+    args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(),param));
 }
 
 void getRenderbufferParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -627,9 +632,9 @@ void getShaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint shader = getIdFromV8GlObject(args,0);
 //    GLsizei bufsize[1];
 //    glGetShaderiv(shader,GL_SHADER_SOURCE_LENGTH,bufsize);
-    GLsizei length[1];
+    GLsizei length = 1;
     GLchar source[512];
-    glGetShaderSource(shader,512,length,source);
+    glGetShaderSource(shader,512,&length,source);
     auto v8Str = v8::String::NewFromUtf8(args.GetIsolate(),source).ToLocalChecked();
     args.GetReturnValue().Set(v8Str);
 }
@@ -637,9 +642,9 @@ void getShaderSource(const v8::FunctionCallbackInfo<v8::Value>& args) {
 void getShaderParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint shader = getIdFromV8GlObject(args,0);
     GLenum pname = getGlEnumParameter(args,1);
-    GLint params[1];
-    glGetShaderiv(shader,pname,params);
-    args.GetReturnValue().Set(params[0]);
+    GLint param;
+    glGetShaderiv(shader,pname,&param);
+    args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(),param));
 }
 
 void getTexParameter(const v8::FunctionCallbackInfo<v8::Value>& args) {
