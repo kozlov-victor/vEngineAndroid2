@@ -2844,13 +2844,10 @@ function main() {
   /** @type {HTMLCanvasElement} */
   var canvas = document.querySelector("#canvas");
   console.log('---------main------------');
-  console.log('canvas',canvas);
   var gl = canvas.getContext("webgl");
   if (!gl) {
     return;
   }
-
-  console.log('gl',gl);
 
   // setup GLSL program
 

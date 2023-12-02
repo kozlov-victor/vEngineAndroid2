@@ -125,6 +125,7 @@ var InitDemo = function () {
 
 	requestAnimationFrame(()=>{
 	    gl.useProgram(program);
+	    //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 	});
 

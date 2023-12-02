@@ -5724,6 +5724,10 @@ var InitDemo = function () {
 
 	var positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
 	var colorAttribLocation = gl.getAttribLocation(program, 'vertColor');
+
+	console.log({positionAttribLocation});
+	console.log({colorAttribLocation});
+
 	gl.vertexAttribPointer(
 		positionAttribLocation, // Attribute location
 		3, // Number of elements per attribute
@@ -5750,6 +5754,10 @@ var InitDemo = function () {
 	var matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
 	var matViewUniformLocation = gl.getUniformLocation(program, 'mView');
 	var matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
+
+    console.log({matWorldUniformLocation});
+    console.log({matViewUniformLocation});
+    console.log({matProjUniformLocation});
 
 	var worldMatrix = new Float32Array(16);
 	var viewMatrix = new Float32Array(16);

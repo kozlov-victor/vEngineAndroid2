@@ -43,20 +43,19 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
             Logger.error("GL context lost. Cannot restore. Exiting.");
             System.exit(0);
         }
-
         DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
         int widthPixels = metrics.widthPixels;
         int heightPixels = metrics.heightPixels;
         VEngine.initV8();
         compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
         compileScriptFromAsset("bootstrap.js");
-        compileScriptFromAsset("index2.js");
+        compileScriptFromAsset("index4.js");
         surfaceAlreadyCreated = true;
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int w, int h) {
-        GLES20.glViewport(0, 0, w, h);
+//        GLES20.glViewport(0, 0, w, h);
 //        if (runtime!=null) {
 //            runtime.executeVoidScript(String.format("innerWidth = %d;innerHeight = %d;",width,height));
 //            runtime.executeVoidScript("_triggerEvent('resize')");
