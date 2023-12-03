@@ -1109,7 +1109,6 @@ void uniformMatrix4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 
 void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    Logger::info("texImage2D_9");
     GLenum target = getGlEnumParameter(args,0);
     GLint level = getGlIntParameter(args,1);
     GLint internalformat = getGlIntParameter(args,2);
@@ -1120,13 +1119,11 @@ void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum type = getGlEnumParameter(args,7);
 
     if (isArrayBuffer(args,8)) {
-        Logger::info("not null");
         auto buf_data = getArrayBuffer(args,8);
         v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
         auto *data = (GLubyte *)con_data.Data();
         glTexImage2D(target,level,internalformat,width,height,border,format,type,data);
     } else {
-        Logger::info("is null");
         auto *pixels = (void *)calloc(4,width*height);
         glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
     }
