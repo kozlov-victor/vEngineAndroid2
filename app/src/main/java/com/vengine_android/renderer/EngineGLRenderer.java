@@ -49,7 +49,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         VEngine.initV8();
         compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
         compileScriptFromAsset("bootstrap.js");
-        compileScriptFromAsset("index4.js");
+        compileScriptFromAsset("index1.js");
         surfaceAlreadyCreated = true;
     }
 

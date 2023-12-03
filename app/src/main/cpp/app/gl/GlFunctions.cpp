@@ -6,6 +6,25 @@
 #include <GLES2/gl2.h>
 #include "app/logger/Logger.h"
 
+bool isArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
+    v8::Isolate* isolate = args.GetIsolate();
+    if (i < 0 || i >= args.Length()) {
+        Logger::error("wrong index");
+        return {};
+    }
+    v8::Local<v8::Value> arg = args[i];
+    if (arg->IsArrayBuffer()) {
+        return true;
+    } else if (arg->IsArrayBufferView()) {
+        return true;
+    } else if (arg->IsTypedArray()) {
+        v8::Local<v8::TypedArray> typedArray = arg.As<v8::TypedArray>();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int index) {
     v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(args[index]);
     v8::Local<v8::String> idKey = v8::String::NewFromUtf8(args.GetIsolate(), "$id", v8::NewStringType::kInternalized).ToLocalChecked();
@@ -20,7 +39,7 @@ GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int 
             return 0;
         }
     } else {
-        Logger::error("no $id key in object");
+        Logger::error("no $id key in object by index",index);
         return 0;
     }
 }
@@ -1082,6 +1101,7 @@ void uniformMatrix4fv(const v8::FunctionCallbackInfo<v8::Value>& args) {
 
 
 void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    Logger::info("texImage2D_9");
     GLenum target = getGlEnumParameter(args,0);
     GLint level = getGlIntParameter(args,1);
     GLint internalformat = getGlIntParameter(args,2);
@@ -1091,17 +1111,16 @@ void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum format = getGlEnumParameter(args,6);
     GLenum type = getGlEnumParameter(args,7);
 
-    if (args[8]->IsNull()) {
-        auto *pixels = (void *)calloc(4,width*height);
-        glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
-    } else {
+    if (isArrayBuffer(args,8)) {
+        Logger::info("not null");
         auto buf_data = getArrayBuffer(args,8);
         v8::ArrayBuffer::Contents con_data=buf_data->GetContents();
-        auto size = static_cast<GLsizeiptr>(con_data.ByteLength());
         auto *data = (GLubyte *)con_data.Data();
-
         glTexImage2D(target,level,internalformat,width,height,border,format,type,data);
-
+    } else {
+        Logger::info("is null");
+        auto *pixels = (void *)calloc(4,width*height);
+        glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
     }
 }
 
