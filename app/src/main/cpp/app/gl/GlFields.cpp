@@ -14,8 +14,8 @@ struct Field {
 void GlFields::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
     std::vector<Field> fields =
             {
-                    {"UNPACK_PREMULTIPLY_ALPHA_WEBGL",               -1},
-                    {"UNPACK_FLIP_Y_WEBGL",                          -1},
+                    {"UNPACK_PREMULTIPLY_ALPHA_WEBGL",               GL_NONE},
+                    {"UNPACK_FLIP_Y_WEBGL",                          GL_NONE},
                     {"DEPTH_BUFFER_BIT",                             GL_DEPTH_BUFFER_BIT},
                     {"STENCIL_BUFFER_BIT",                           GL_STENCIL_BUFFER_BIT},
                     {"COLOR_BUFFER_BIT",                             GL_COLOR_BUFFER_BIT},

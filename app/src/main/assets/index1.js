@@ -7015,10 +7015,15 @@ var AbstractTexture = (function () {
                     throw new DebugError("unknown interpolation mode ".concat(mode));
                 break;
         }
+        console.log('----1----');
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, glMode);
+        console.log('----2----');
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, glMode);
+        console.log('----3----');
         this._interpolationMode = mode;
+        console.log('----4----');
         this.afterOperation();
+        console.log('----5----');
     };
     AbstractTexture.prototype.beforeOperation = function () {
         this._currentTextureAt0 = AbstractTexture.currentBindTextureAt[0];

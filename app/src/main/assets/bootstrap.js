@@ -36,6 +36,8 @@ alert = (err)=>console.error(err);
 //                argsDebug.push(glNameByName[arg]||arg);
 //            });
 //            throw new Error(`error invocation ${key} with args ${argsDebug} (${args})`);
+//        } else {
+//            //console.log(key,args);
 //        }
 //        return result;
 //    }

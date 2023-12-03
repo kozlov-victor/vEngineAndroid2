@@ -18,15 +18,23 @@ bool isArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     } else if (arg->IsArrayBufferView()) {
         return true;
     } else if (arg->IsTypedArray()) {
-        v8::Local<v8::TypedArray> typedArray = arg.As<v8::TypedArray>();
         return true;
     } else {
         return false;
     }
 }
 
+
 GLuint getIdFromV8GlObject(const v8::FunctionCallbackInfo<v8::Value>& args, int index) {
+    if (index < 0 || index >= args.Length()) {
+        Logger::error("wrong index");
+        return {};
+    }
+
     v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(args[index]);
+    if (!obj->IsObject()) return 0;
+
+
     v8::Local<v8::String> idKey = v8::String::NewFromUtf8(args.GetIsolate(), "$id", v8::NewStringType::kInternalized).ToLocalChecked();
 
     if (obj->HasOwnProperty(args.GetIsolate()->GetCurrentContext(), idKey).FromMaybe(false)) {
@@ -776,8 +784,8 @@ void linkProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void pixelStorei(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    GLint pname = getGlIntParameter(args,0);
-    if (pname==-1) return;
+    GLenum pname = getGlIntParameter(args,0);
+    if (pname==GL_NONE) return;
     GLint param = getGlIntParameter(args,1);
     glPixelStorei(pname,param);
 }
@@ -1122,6 +1130,7 @@ void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
         auto *pixels = (void *)calloc(4,width*height);
         glTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
     }
+
 }
 
 struct Fun {
