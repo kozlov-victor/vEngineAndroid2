@@ -56,10 +56,8 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl10, int w, int h) {
 //        GLES20.glViewport(0, 0, w, h);
-//        if (runtime!=null) {
-//            runtime.executeVoidScript(String.format("innerWidth = %d;innerHeight = %d;",width,height));
-//            runtime.executeVoidScript("_triggerEvent('resize')");
-//        }
+          // compileInlineScript("innerWidth = "+w+";innerHeight = "+h+";_triggerEvent('resize');");
+        Logger.info("---on surface changed----" + w + " " + h);
     }
 
     @Override

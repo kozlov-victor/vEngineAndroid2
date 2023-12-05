@@ -250,14 +250,14 @@ alert = (err)=>console.error(err);
 
     window.document = new Document();
     window.navigator = {
-        platform: 'vEngine',
-        userAgent: 'vEngine'
+        platform:'vEngine',
+        userAgent:'vEngine'
     };
     window.innerWidth = innerWidth;
     window.innerHeight = innerHeight;
-    window.self = window;
+    window.self = window.top = window;
     window.performance = {
-        now:()=>new Date().getTime(),
+        now:()=>Date().now(),
     };
     window.setTimeout = ()=>{};
     window.setInterval = ()=>{};
@@ -265,5 +265,20 @@ alert = (err)=>console.error(err);
     window.requestAnimationFrame = (fn)=>{
         _requestAnimationFrameGlobalCallBack = fn;
     };
-    window.addEventListener = ()=>{}; // todo
+
+
+    let events = [];
+    window.addEventListener = (name,cb)=>{
+        events.push({name:name,cb:cb});
+    };
+    window.removeEventListener = (name,cb)=>{
+        events.splice(events.indexOf(it=>it.cb===cb),1);
+    }
+    window._triggerEvent = (name,arg)=>{
+        console.log('resize');
+        events.forEach(it=>{
+            if (it.name===name) it.cb(arg);
+        });
+    }
+
 })();

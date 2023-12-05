@@ -212,6 +212,7 @@ var Size = (function (_super) {
 }(_engine_geometry_abstract_observableEntity__WEBPACK_IMPORTED_MODULE_4__/* .ObservableEntity */ .R));
 
 
+
 /***/ }),
 
 /***/ 6221:
@@ -448,6 +449,7 @@ if (!Number.isInteger) {
             Math.floor(value) === value;
     };
 }
+Symbol.metadata = 'metadata';
 
 
 /***/ }),
@@ -525,10 +527,10 @@ var DEFAULT_FONT_PARAMS = {
 var LAT_CHARS = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
 var STANDARD_SYMBOLS = '1234567890 ' +
     '"!`?\'.,;:()[]{}<>|/@\\^$-%+=#_&~*';
-var CYR_CHARS = 'РђР°Р‘Р±Р’РІР“РіР”РґР•РµРЃС‘Р–Р¶Р—Р·РРёР™Р№РљРєР›Р»РњРјРќРЅ' +
-    'РћРѕРџРїР СЂРЎСЃРўС‚РЈСѓР¤С„РҐС…Р¦С†Р§С‡РЁС€Р©С‰' +
-    'Р«С‹Р¬СЊРЄСЉР­СЌР®СЋРЇСЏ' +
-    'Р‡С—Р†С–Р„С”ТђТ‘';
+var CYR_CHARS = 'АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНн' +
+    'ОоПпРрСсТтУуФфХхЦцЧчШшЩщ' +
+    'ЫыЬьЪъЭэЮюЯя' +
+    'ЇїІіЄєҐґ';
 
 
 /***/ }),
@@ -1190,16 +1192,6 @@ module.exports = [
     "#define HALF    .5",
     "#define ZERO    .0",
     "#define ONE     1.",
-    "vec2 _unpack(float n) {",
-    "float a = n/256.;",
-    "float b = n - float(int(a))*256.;",
-    "return vec2(a/255.,b/255.);",
-    "}",
-    "vec4 unpackColor(vec2 v) {",
-    "vec2 a = _unpack(v[0]);",
-    "vec2 b = _unpack(v[1]);",
-    "return vec4(a[0],a[1],b[0],b[1]);",
-    "}",
     "void main(){",
     "vec2 uv;",
     "int idx = int(a_idx);",
@@ -1231,7 +1223,7 @@ module.exports = [
     "-ONE + 2.0 * pos.y/u_viewPort.y,",
     "ZERO,  ONE",
     ");",
-    "v_color = unpackColor(a_color);",
+    "v_color = a_color;",
     "}"
 ].join('\n');
 
@@ -1782,6 +1774,7 @@ var KeyBoardEvent = (function (_super) {
     return KeyBoardEvent;
 }(KeyPadEvent));
 
+
 ;// CONCATENATED MODULE: ./engine/control/keyboard/keyboardControl.ts
 
 
@@ -2022,6 +2015,7 @@ var Point2d = (function (_super) {
     Point2d.pool = new objectPool/* ObjectPool */.L(Point2d, 4);
     return Point2d;
 }(observableEntity/* ObservableEntity */.R));
+
 
 ;// CONCATENATED MODULE: ./engine/delegates/parentChildDelegate.ts
 
@@ -2481,6 +2475,7 @@ var Color = (function (_super) {
     return Color;
 }(observableEntity/* ObservableEntity */.R));
 
+
 ;// CONCATENATED MODULE: ./engine/misc/easing/functions/linear.ts
 var EasingLinear = function (t, b, c, d) { return c * t / d + b; };
 
@@ -2905,6 +2900,7 @@ var Point3d = (function (_super) {
     Point3d._pool = new objectPool/* ObjectPool */.L(Point3d, 4);
     return Point3d;
 }(Point2d));
+
 
 ;// CONCATENATED MODULE: ./engine/misc/math/vec3.ts
 
@@ -3545,6 +3541,7 @@ var Rect = (function (_super) {
     Rect.rectPool = new objectPool/* ObjectPool */.L(Rect);
     return Rect;
 }(observableEntity/* ObservableEntity */.R));
+
 
 ;// CONCATENATED MODULE: ./engine/core/baseModel.ts
 
@@ -4882,7 +4879,7 @@ var loadViaXmlHttp = function (urlRequest, onProgress) {
     if (!urlRequest.method)
         urlRequest.method = 'GET';
     var xhr = new XMLHttpRequest();
-    xhr.open(urlRequest.method, addUrlParameter(urlRequest.url, 'modified', 1690668626419), true);
+    xhr.open(urlRequest.method, addUrlParameter(urlRequest.url, 'modified', 1701719677427), true);
     xhr.responseType = urlRequest.responseType;
     if (xhr.responseType === 'blob') {
         xhr.setRequestHeader('Accept-Ranges', 'bytes');
@@ -5357,7 +5354,7 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        loader = ResourceLoader._createUrlLoader(req);
+                        loader = _a._createUrlLoader(req);
                         if (progressFn !== undefined)
                             loader.onProgress = progressFn;
                         return [4, loader.load()];
@@ -5396,8 +5393,8 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        req = ResourceLoader._pathJoin('', req);
-                        return [4, ResourceLoader._loadHtmlImage(req, progress)];
+                        req = _a._pathJoin('', req);
+                        return [4, _a._loadHtmlImage(req, progress)];
                     case 1:
                         img = _b.sent();
                         return [2, this.game.getRenderer().createTexture(img)];
@@ -5424,34 +5421,34 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        leftSide = ResourceLoader._pathJoin('', leftSide);
-                        rightSide = ResourceLoader._pathJoin('', rightSide);
-                        topSide = ResourceLoader._pathJoin('', topSide);
-                        bottomSide = ResourceLoader._pathJoin('', bottomSide);
-                        frontSide = ResourceLoader._pathJoin('', frontSide);
-                        backSide = ResourceLoader._pathJoin('', backSide);
+                        leftSide = _a._pathJoin('', leftSide);
+                        rightSide = _a._pathJoin('', rightSide);
+                        topSide = _a._pathJoin('', topSide);
+                        bottomSide = _a._pathJoin('', bottomSide);
+                        frontSide = _a._pathJoin('', frontSide);
+                        backSide = _a._pathJoin('', backSide);
                         currProgress = 0;
                         progressCallBack = function (n) {
                             currProgress += n;
                             if (progress !== undefined)
                                 progress(n / 6);
                         };
-                        return [4, ResourceLoader._loadHtmlImage(leftSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(leftSide, progressCallBack)];
                     case 1:
                         imgLeft = _b.sent();
-                        return [4, ResourceLoader._loadHtmlImage(rightSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(rightSide, progressCallBack)];
                     case 2:
                         imgRight = _b.sent();
-                        return [4, ResourceLoader._loadHtmlImage(topSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(topSide, progressCallBack)];
                     case 3:
                         imgTop = _b.sent();
-                        return [4, ResourceLoader._loadHtmlImage(bottomSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(bottomSide, progressCallBack)];
                     case 4:
                         imgBottom = _b.sent();
-                        return [4, ResourceLoader._loadHtmlImage(frontSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(frontSide, progressCallBack)];
                     case 5:
                         imgFront = _b.sent();
-                        return [4, ResourceLoader._loadHtmlImage(backSide, progressCallBack)];
+                        return [4, _a._loadHtmlImage(backSide, progressCallBack)];
                     case 6:
                         imgBack = _b.sent();
                         return [2, this.game.getRenderer().createCubeTexture(imgLeft, imgRight, imgTop, imgBottom, imgFront, imgBack)];
@@ -5464,8 +5461,8 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        req = ResourceLoader._pathJoin('', req);
-                        return [4, ResourceLoader._loadAndProcessText(req, function (t) { return t; }, progress)];
+                        req = _a._pathJoin('', req);
+                        return [4, _a._loadAndProcessText(req, function (t) { return t; }, progress)];
                     case 1: return [2, _b.sent()];
                 }
             });
@@ -5505,9 +5502,9 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        req = ResourceLoader._pathJoin('', req);
+                        req = _a._pathJoin('', req);
                         postPrecessFn = function (t) { return JSON.parse(t); };
-                        return [4, ResourceLoader._loadAndProcessText(req, postPrecessFn, progress)];
+                        return [4, _a._loadAndProcessText(req, postPrecessFn, progress)];
                     case 1: return [2, _b.sent()];
                 }
             });
@@ -5519,8 +5516,8 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        req = ResourceLoader._pathJoin('', req);
-                        loader = ResourceLoader._createUrlLoader(req, 'arraybuffer');
+                        req = _a._pathJoin('', req);
+                        loader = _a._createUrlLoader(req, 'arraybuffer');
                         if (progress !== undefined)
                             loader.onProgress = progress;
                         return [4, loader.load()];
@@ -5541,8 +5538,8 @@ var ResourceLoader = (function () {
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        req = ResourceLoader._pathJoin('', req);
-                        loader = ResourceLoader._createUrlLoader(req, 'arraybuffer');
+                        req = _a._pathJoin('', req);
+                        loader = _a._createUrlLoader(req, 'arraybuffer');
                         if (progress !== undefined)
                             loader.onProgress = progress;
                         return [4, loader.load()];
@@ -5578,11 +5575,11 @@ var ResourceLoader = (function () {
                         if ( true && !pageFile)
                             throw new debugError/* DebugError */.N("no 'file' attribute for 'page' node");
                         if ((0,object/* isString */.HD)(baseUrlCopy)) {
-                            baseUrlCopy = path.join(ResourceLoader.BASE_URL, baseUrlCopy, pageFile);
+                            baseUrlCopy = path.join(_a.BASE_URL, baseUrlCopy, pageFile);
                         }
                         else {
                             baseUrlCopy = (0,tslib_es6/* __assign */.pi)({}, baseUrlCopy);
-                            baseUrlCopy.url = path.join(ResourceLoader.BASE_URL, baseUrlCopy.url, pageFile);
+                            baseUrlCopy.url = path.join(_a.BASE_URL, baseUrlCopy.url, pageFile);
                         }
                         return [4, this.loadTexture(baseUrlCopy, function (n) {
                                 if (progress !== undefined)
@@ -5612,10 +5609,10 @@ var ResourceLoader = (function () {
                     case 0:
                         docUrl = baseUrl;
                         if ((0,object/* isString */.HD)(docUrl)) {
-                            docUrl = path.join(ResourceLoader.BASE_URL, docUrl, docFileName);
+                            docUrl = path.join(_a.BASE_URL, docUrl, docFileName);
                         }
                         else {
-                            docUrl = (0,tslib_es6/* __assign */.pi)((0,tslib_es6/* __assign */.pi)({}, docUrl), { url: path.join(ResourceLoader.BASE_URL, docUrl.url, docFileName) });
+                            docUrl = (0,tslib_es6/* __assign */.pi)((0,tslib_es6/* __assign */.pi)({}, docUrl), { url: path.join(_a.BASE_URL, docUrl.url, docFileName) });
                         }
                         return [4, this.loadText(docUrl, function (n) { return progress && progress(n / 2); })];
                     case 1:
@@ -5652,7 +5649,7 @@ var ResourceLoader = (function () {
     ResourceLoader._loadHtmlImage = function (imgUrl, progress) {
         var url = imgUrl.url ? imgUrl.url : imgUrl;
         if (!_a._isGlobalUrl(url))
-            url = addUrlParameter(url, 'modified', 1690668612859);
+            url = addUrlParameter(url, 'modified', 1701719662904);
         return new Promise(function (resolve, reject) {
             var img = new window.Image();
             img.src = url;
@@ -5672,6 +5669,7 @@ var ResourceLoader = (function () {
     };
     return ResourceLoader;
 }());
+
 
 ;// CONCATENATED MODULE: ./engine/resources/taskQueue.ts
 
@@ -6034,14 +6032,15 @@ var Game = (function () {
     Game._UPDATE_TIME_RATE = Math.ceil(1000 / 60);
     return Game;
 }());
+
 if (true) {
     if (!window.__POLYFILLS_INCLUDED__)
         throw new debugError/* DebugError */.N("polyfills module is not included!");
 }
 if (true) {
     var now = Date.now();
-    var passed = now - 1690668609719;
-    console.log("last compiled ".concat(passed / 1000, " sec ago, ").concat('dev (b29b88)'));
+    var passed = now - 1701719660097;
+    console.log("last compiled ".concat(passed / 1000, " sec ago, ").concat('dev (82180d)'));
 }
 var MainLoop = (function () {
     function MainLoop(game) {
@@ -7417,6 +7416,7 @@ var PolylineTriangulator = (function () {
     PolylineTriangulator.roundMinAngle = 0.174533;
     return PolylineTriangulator;
 }());
+
 
 ;// CONCATENATED MODULE: ./engine/renderable/impl/geometry/_internal/triangulatedPathFromPolyline.ts
 
@@ -9856,33 +9856,11 @@ var arcToSvgCurve = function (x, y, radius, startAngle, endAngle) {
 
 
 
-var ColorEx = (function (_super) {
-    (0,tslib_es6/* __extends */.ZT)(ColorEx, _super);
-    function ColorEx() {
-        var _this = _super.call(this) || this;
-        _this.packed = [0, 0];
-        _this.observe(function () {
-            _this.packed[0] = (_this.r << 8) | _this.g;
-            _this.packed[1] = (_this.b << 8) | _this.a;
-        });
-        return _this;
-    }
-    ColorEx.prototype.getPackedColor = function () {
-        return this.packed;
-    };
-    ColorEx.prototype.clone = function () {
-        var col = new ColorEx();
-        col.setRGBA(this.r, this.g, this.b, this.a);
-        return col;
-    };
-    return ColorEx;
-}(Color));
-
 var BatchedImage = (function (_super) {
     (0,tslib_es6/* __extends */.ZT)(BatchedImage, _super);
     function BatchedImage(game) {
         var _this = _super.call(this, game) || this;
-        _this.fillColor = new ColorEx();
+        _this.fillColor = new Color();
         _this.size.setWH(16);
         _this.fillColor.fromJSON(Color.GREY.toJSON());
         return _this;
@@ -11557,6 +11535,7 @@ var AbstractGradient = (function () {
     return AbstractGradient;
 }());
 
+
 ;// CONCATENATED MODULE: ./engine/renderer/webGl/painters/misc.ts
 
 var misc_Mat16Holder = Mat4.Mat16Holder;
@@ -11659,12 +11638,12 @@ var Device = (function () {
     };
     Device.logInfo = function () {
         console.log({
-            isTouch: Device.isTouch,
-            isFrame: Device.isFrame,
-            isIPhone: Device.isIPhone,
-            isAndroid: Device.isAndroid,
-            buildAt: 1690668626332,
-            embeddedEngine: Device.embeddedEngine,
+            isTouch: _a.isTouch,
+            isFrame: _a.isFrame,
+            isIPhone: _a.isIPhone,
+            isAndroid: _a.isAndroid,
+            buildAt: 1701719677297,
+            embeddedEngine: _a.embeddedEngine,
             screenResolution: "".concat(this.getScreenResolution()[0], "x").concat(this.getScreenResolution()[1]),
         });
     };
@@ -11678,6 +11657,7 @@ var Device = (function () {
     Device.embeddedEngine = navigator.userAgent === 'vEngine';
     return Device;
 }());
+
 
 ;// CONCATENATED MODULE: ./engine/renderer/abstract/scaleStrategy/impl/ScaleStrategyStretchCanvasToScreen.ts
 
@@ -12358,6 +12338,7 @@ var AbstractTexture = (function () {
     return AbstractTexture;
 }());
 
+
 ;// CONCATENATED MODULE: ./engine/renderer/webGl/base/texture/texture.ts
 
 
@@ -12930,16 +12911,20 @@ var AbstractBatchArray = (function () {
 var ColorBatchArray = (function (_super) {
     (0,tslib_es6/* __extends */.ZT)(ColorBatchArray, _super);
     function ColorBatchArray() {
-        return _super.call(this, 2) || this;
+        return _super.call(this, 4) || this;
     }
     ColorBatchArray.prototype.onPutNextChunk = function (model, offset) {
-        var colorArray = model.getPackedColor();
-        var rg = colorArray[0];
-        var ba = colorArray[1];
+        var colorArray = model.asGL();
+        var r = colorArray[0];
+        var g = colorArray[1];
+        var b = colorArray[2];
+        var a = colorArray[3];
         var array = this.array;
         for (var i = 0; i < NUM_OF_VERTICES_IN_QUAD; ++i) {
-            array[offset++] = rg;
-            array[offset++] = ba;
+            array[offset++] = r;
+            array[offset++] = g;
+            array[offset++] = b;
+            array[offset++] = a;
         }
     };
     return ColorBatchArray;
@@ -13013,7 +12998,7 @@ var BatchPainter = (function (_super) {
         var gen = new ShaderGenerator();
         _this.u_viewPort = gen.addVertexUniform(GL_TYPE.FLOAT_VEC2, 'u_viewPort');
         _this.a_idx = gen.addAttribute(GL_TYPE.FLOAT, 'a_idx');
-        _this.a_color = gen.addAttribute(GL_TYPE.FLOAT_VEC2, 'a_color');
+        _this.a_color = gen.addAttribute(GL_TYPE.FLOAT_VEC4, 'a_color');
         _this.a_angle = gen.addAttribute(GL_TYPE.FLOAT, 'a_angle');
         _this.a_pos = gen.addAttribute(GL_TYPE.FLOAT_VEC4, 'a_pos');
         gen.addVarying(GL_TYPE.FLOAT_VEC4, 'v_color');
@@ -13052,7 +13037,7 @@ var BatchPainter = (function (_super) {
             miscBuffersInfo: [
                 {
                     array: _this.colorBatchArray.getArray(), type: gl.FLOAT,
-                    size: 2, attrName: _this.a_color,
+                    size: 4, attrName: _this.a_color,
                 },
                 {
                     array: _this.angleBatchArray.getArray(), type: gl.FLOAT,
@@ -13101,6 +13086,7 @@ var BatchPainter = (function (_super) {
     BatchPainter.NUM_OF_QUADS_IN_BATCH = 8000;
     return BatchPainter;
 }(AbstractPainter));
+
 
 ;// CONCATENATED MODULE: ./engine/renderer/webGl/painters/impl/base/simpleImage/simpleImagePainter.ts
 
@@ -14344,7 +14330,6 @@ var MainScene = (function (_super) {
     };
     MainScene.prototype.onPreloading = function (taskQueue) {
         var _this = this;
-        _super.prototype.onPreloading.call(this, taskQueue);
         taskQueue.addNextTask(function (progress) { return (0,tslib_es6/* __awaiter */.mG)(_this, void 0, void 0, function () {
             var _a;
             return (0,tslib_es6/* __generator */.Jh)(this, function (_b) {
@@ -14358,6 +14343,7 @@ var MainScene = (function (_super) {
                 }
             });
         }); });
+        _super.prototype.onPreloading.call(this, taskQueue);
     };
     return MainScene;
 }(Scene));
@@ -14388,6 +14374,7 @@ var MousePointsPullHolder = (function () {
     MousePointsPullHolder.mousePointsPool = new objectPool/* ObjectPool */.L(MousePoint);
     return MousePointsPullHolder;
 }());
+
 
 ;// CONCATENATED MODULE: ./engine/control/mouse/mouseControlHelper.ts
 

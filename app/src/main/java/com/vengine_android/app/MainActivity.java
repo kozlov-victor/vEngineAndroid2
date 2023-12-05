@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
         Logger.info("----activity on create------------");
         super.onCreate(savedInstanceState);
 
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
         App.surfaceView = findViewById(R.id.engine_gl_surface_view);
@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         App.surfaceResizer.setSize(min,min);
         //FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
+
+
 
     @Override
     protected void onDestroy() {

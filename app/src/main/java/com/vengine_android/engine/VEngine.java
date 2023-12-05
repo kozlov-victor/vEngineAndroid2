@@ -19,6 +19,7 @@ public class VEngine {
     public static native JsCompilationResult compileScript(String fileName, String source);
     public static native void updateFrame();
 
+
     public static native void dispose();
 
     @JniAccess

@@ -727,50 +727,50 @@ void hint(const v8::FunctionCallbackInfo<v8::Value>& args) {
     glHint(target,mode);
 }
 
-void isBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) { // todo
+void isBuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint buffer = getIdFromV8GlObject(args,0);
     GLboolean res = glIsBuffer(buffer);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isContextLost(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
-    args.GetReturnValue().Set(false);
+void isContextLost(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(), false));
 }
 
-void isEnabled(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isEnabled(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLenum cap = getGlEnumParameter(args,0);
     GLboolean res = glIsEnabled(cap);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isFramebuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isFramebuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args,0);
     GLboolean res = glIsFramebuffer(target);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isProgram(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args,0);
     GLboolean res = glIsProgram(target);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isRenderbuffer(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args,0);
     GLboolean res = glIsRenderbuffer(target);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isShader(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isShader(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args,0);
     GLboolean res = glIsShader(target);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
-void isTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {// todo
+void isTexture(const v8::FunctionCallbackInfo<v8::Value>& args) {
     GLuint target = getGlUIntParameter(args,0);
     GLboolean res = glIsTexture(target);
-    args.GetReturnValue().Set(res==1);
+    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(),res==GL_TRUE));
 }
 
 void lineWidth(const v8::FunctionCallbackInfo<v8::Value>& args) {
