@@ -5,6 +5,7 @@
 #include "GlFunctions.h"
 #include <GLES2/gl2.h>
 #include "app/logger/Logger.h"
+#include "app/misc/fun.hpp"
 
 bool isArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
     v8::Isolate* isolate = args.GetIsolate();
@@ -1129,11 +1130,6 @@ void texImage2D_9(const v8::FunctionCallbackInfo<v8::Value>& args) {
     }
 
 }
-
-struct Fun {
-    std::string name;
-    void (*value)(const v8::FunctionCallbackInfo<v8::Value>&);
-};
 
 void GlFunctions::create(v8::Isolate *isolate,v8::Local<v8::Context> &context_local, v8::Local<v8::Object> &gl) {
 

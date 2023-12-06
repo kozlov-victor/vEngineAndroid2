@@ -245,6 +245,7 @@ alert = (err)=>console.error(err);
 
     };
 
+    window.XMLHttpRequest = XMLHttpRequest;
     window.document = new Document();
     window.navigator = {
         platform:'vEngine',

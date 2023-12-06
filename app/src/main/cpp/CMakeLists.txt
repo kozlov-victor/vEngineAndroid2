@@ -49,6 +49,7 @@ add_library(
         app/js/Js.cpp app/logger/Logger.cpp app/console/Console.cpp
         app/gl/GlFields.cpp app/gl/GlFunctions.cpp app/external_functions/ExternalFunctions.cpp
         app/js_compilation_result/JsCompilationResult.cpp
+        app/misc/fun.hpp
 )
 target_include_directories( ${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR} )
 
