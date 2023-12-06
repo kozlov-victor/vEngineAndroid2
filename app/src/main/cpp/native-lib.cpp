@@ -32,7 +32,7 @@ Java_com_vengine_1android_engine_VEngine_compileScript(JNIEnv *env, jclass clazz
                     jstring2string(env,file_name).c_str(),
                     jstring2string(env,source).c_str()
             );
-    jclass cl = env->FindClass("com/vengine_android/app/JsCompilationResult");
+    jclass cl = env->FindClass("com/vengine_android/model/JsCompilationResult");
     jmethodID cid = env->GetMethodID(cl, "<init>", "(ZLjava/lang/String;)V");
     return env->NewObject(cl, cid, result.success,env->NewStringUTF(result.error.c_str()));
 }

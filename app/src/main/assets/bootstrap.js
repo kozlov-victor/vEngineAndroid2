@@ -155,12 +155,11 @@ alert = (err)=>console.error(err);
         set src(val){
             this._src = val;
             _taskQueue.addNextTask(()=>{
-                const bitmapId = _external._loadBitmap(val);
-                if (bitmapId!==0) {
-                    this._bitmap = {$id:bitmapId};
-                    // todo width height
-                    this.width = 100;
-                    this.height = 100;
+                const {id,width,height} = _external._loadBitmap(val);
+                if (id!==0) {
+                    this._bitmap = {$id:id};
+                    this.width = width;
+                    this.height = height;
                     this._onload && this._onload();
                 }
                 else this.onerror && this.onerror();
@@ -232,13 +231,11 @@ alert = (err)=>console.error(err);
                 this.onload && this.onload();
                 this.onreadystatechange && this.onreadystatechange();
             };
-            const errorCallback = (e)=>{
-                console.error(e);
-            };
             _taskQueue.addNextTask(()=>{ // todo
-                (this.responseType==='blob' || this.responseType==='arraybuffer')?
-                    _files.loadAssetAsBinary(currUrl,successCallback,errorCallback):
-                    _files.loadAssetAsString(currUrl,successCallback,errorCallback);
+                const resp = (this.responseType==='blob' || this.responseType==='arraybuffer')?
+                    _external.loadBinary(currUrl):
+                    _external.loadText(currUrl);
+                successCallback(resp);
             });
         }
 
@@ -275,7 +272,6 @@ alert = (err)=>console.error(err);
         events.splice(events.indexOf(it=>it.cb===cb),1);
     }
     window._triggerEvent = (name,arg)=>{
-        console.log('resize');
         events.forEach(it=>{
             if (it.name===name) it.cb(arg);
         });

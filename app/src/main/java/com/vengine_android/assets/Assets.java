@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import com.vengine_android.app.App;
+import com.vengine_android.model.BitmapInfo;
 import com.vengine_android.utils.Logger;
 
 import java.io.BufferedReader;
@@ -58,7 +59,7 @@ public class Assets {
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
-    public int loadBitmap(String fileName) {
+    public BitmapInfo loadBitmap(String fileName) {
         fileName = processLocalUrl(fileName);
         Bitmap bitmap;
         if (fileName.startsWith("data:image") && fileName.contains(",")) {
@@ -69,12 +70,12 @@ public class Assets {
                 bitmap = BitmapFactory.decodeStream(inputStream);
             } catch (IOException e) {
                 e.printStackTrace();
-                return 0;
+                return new BitmapInfo(0,0,0);
             }
         }
         int key = bitmapCache.size() + 1;
         bitmapCache.put(key,bitmap);
-        return key;
+        return new BitmapInfo(key,bitmap.getWidth(),bitmap.getHeight());
     }
 
     public Bitmap getCachedBitmap(int id) {

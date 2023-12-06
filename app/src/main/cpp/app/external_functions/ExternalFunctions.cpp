@@ -72,11 +72,38 @@ void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::C
         v8::String::NewFromUtf8(isolate, "_loadBitmap").ToLocalChecked(),
         v8::Function::New(context_local, [](auto args){
             jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
-            jmethodID m = envClosure->GetStaticMethodID(cl, "loadBitmap", "(Ljava/lang/String;)I");
+            jmethodID m = envClosure->GetStaticMethodID(cl, "loadBitmap", "(Ljava/lang/String;)Lcom/vengine_android/model/BitmapInfo;");
             v8::String::Utf8Value str(args.GetIsolate(), args[0]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
             jstring jStr = envClosure->NewStringUTF(*str);
-            jint bitmapId = envClosure->CallStaticIntMethod(cl, m, jStr);
-            args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(),bitmapId));
+            jobject jObj = envClosure->CallStaticObjectMethod(cl, m, jStr); // class bitmapInfo
+
+            jclass bitmapInfoCl = envClosure->FindClass("com/vengine_android/model/BitmapInfo");
+            jmethodID getIdMtd = envClosure->GetMethodID(bitmapInfoCl,"getId", "()I");
+            jmethodID getWidthMtd = envClosure->GetMethodID(bitmapInfoCl,"getWidth", "()I");
+            jmethodID getHeightMtd = envClosure->GetMethodID(bitmapInfoCl,"getHeight", "()I");
+
+            jint id = envClosure->CallIntMethod(jObj,getIdMtd);
+            jint width = envClosure->CallIntMethod(jObj,getWidthMtd);
+            jint height = envClosure->CallIntMethod(jObj,getHeightMtd);
+
+            v8::Local<v8::Object> result = v8::Object::New(args.GetIsolate());
+            result->Set(
+                args.GetIsolate()->GetCurrentContext(),
+                v8::String::NewFromUtf8(args.GetIsolate(), "id").ToLocalChecked(),
+                v8::Integer::NewFromUnsigned(args.GetIsolate(), id)
+            ).Check();
+            result->Set(
+                args.GetIsolate()->GetCurrentContext(),
+                v8::String::NewFromUtf8(args.GetIsolate(), "width").ToLocalChecked(),
+                v8::Integer::NewFromUnsigned(args.GetIsolate(), width)
+            ).Check();
+            result->Set(
+                args.GetIsolate()->GetCurrentContext(),
+                v8::String::NewFromUtf8(args.GetIsolate(), "height").ToLocalChecked(),
+                v8::Integer::NewFromUnsigned(args.GetIsolate(), height)
+            ).Check();
+
+            args.GetReturnValue().Set(result);
         }).ToLocalChecked()
     ).Check();
     ext->Set(

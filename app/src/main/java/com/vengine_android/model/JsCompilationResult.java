@@ -1,4 +1,4 @@
-package com.vengine_android.app;
+package com.vengine_android.model;
 
 public class JsCompilationResult {
     private final boolean success;

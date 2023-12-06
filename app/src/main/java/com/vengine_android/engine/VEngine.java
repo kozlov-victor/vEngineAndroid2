@@ -3,7 +3,8 @@ package com.vengine_android.engine;
 import android.opengl.GLUtils;
 
 import com.vengine_android.app.App;
-import com.vengine_android.app.JsCompilationResult;
+import com.vengine_android.model.BitmapInfo;
+import com.vengine_android.model.JsCompilationResult;
 
 public class VEngine {
 
@@ -43,7 +44,7 @@ public class VEngine {
     }
 
     @JniAccess
-    public static int loadBitmap(String fileName) {
+    public static BitmapInfo loadBitmap(String fileName) {
         return App.assets.loadBitmap(fileName);
     }
 

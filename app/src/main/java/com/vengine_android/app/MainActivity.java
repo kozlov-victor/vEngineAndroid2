@@ -1,9 +1,11 @@
 package com.vengine_android.app;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.vengine_android.utils.Logger;
@@ -31,6 +33,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        App.engineGLRenderer.requestResize();
+    }
 
     @Override
     protected void onDestroy() {

@@ -1,11 +1,10 @@
 package com.vengine_android.renderer;
 
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.DisplayMetrics;
 
 import com.vengine_android.utils.FPSCounter;
-import com.vengine_android.app.JsCompilationResult;
+import com.vengine_android.model.JsCompilationResult;
 import com.vengine_android.utils.Logger;
 import com.vengine_android.engine.VEngine;
 import com.vengine_android.app.App;
@@ -17,6 +16,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
 
     private final FPSCounter fpsCounter = new FPSCounter();
     private boolean surfaceAlreadyCreated = false;
+    private boolean resizeRequested = false;
 
     private void compileScriptFromAsset(String assetFileName) {
         JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileName);
@@ -34,6 +34,17 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    private void applyScreenSize() {
+        DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
+        int widthPixels = metrics.widthPixels;
+        int heightPixels = metrics.heightPixels;
+        compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
+    }
+
+    public void requestResize() {
+        this.resizeRequested = true;
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         Logger.info("------renderer on surface created----------" + this);
@@ -43,26 +54,24 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
             Logger.error("GL context lost. Cannot restore. Exiting.");
             System.exit(0);
         }
-        DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
-        int widthPixels = metrics.widthPixels;
-        int heightPixels = metrics.heightPixels;
         VEngine.initV8();
-        compileInlineScript("innerWidth = "+widthPixels+";innerHeight = "+heightPixels+";");
+        applyScreenSize();
         compileScriptFromAsset("bootstrap.js");
         compileScriptFromAsset("index7.js");
         surfaceAlreadyCreated = true;
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl10, int w, int h) {
-//        GLES20.glViewport(0, 0, w, h);
-          // compileInlineScript("innerWidth = "+w+";innerHeight = "+h+";_triggerEvent('resize');");
-        Logger.info("---on surface changed----" + w + " " + h);
-    }
+    public void onSurfaceChanged(GL10 gl10, int i, int i1) {}
 
     @Override
     public void onDrawFrame(GL10 gl10) {
         VEngine.updateFrame();
+        if (resizeRequested) {
+            applyScreenSize();
+            compileInlineScript("_triggerEvent('resize');");
+            resizeRequested = false;
+        }
         fpsCounter.logFrame();
     }
 }
