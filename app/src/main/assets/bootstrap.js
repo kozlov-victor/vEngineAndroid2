@@ -233,8 +233,8 @@ alert = (err)=>console.error(err);
             };
             _taskQueue.addNextTask(()=>{ // todo
                 const resp = (this.responseType==='blob' || this.responseType==='arraybuffer')?
-                    _external.loadBinary(currUrl):
-                    _external.loadString(currUrl);
+                    _external._loadBinary(currUrl):
+                    _external._loadString(currUrl);
                 successCallback(resp);
             });
         }
