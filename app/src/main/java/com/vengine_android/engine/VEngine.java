@@ -49,6 +49,11 @@ public class VEngine {
     }
 
     @JniAccess
+    public static String loadString(String fileName) {
+        return App.assets.loadString(fileName);
+    }
+
+    @JniAccess
     public static void getBitmap(int target, int level ,int bitmap) {
         GLUtils.texImage2D(target,level,App.assets.getCachedBitmap(bitmap),0);
     }

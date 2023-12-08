@@ -78,6 +78,11 @@ public class Assets {
         return new BitmapInfo(key,bitmap.getWidth(),bitmap.getHeight());
     }
 
+    public String loadString(String fileName) {
+        fileName = processLocalUrl(fileName);
+        return readAsset(fileName);
+    }
+
     public Bitmap getCachedBitmap(int id) {
         return bitmapCache.get(id);
     }

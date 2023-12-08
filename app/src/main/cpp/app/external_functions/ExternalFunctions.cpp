@@ -7,6 +7,7 @@
 #include "ExternalFunctions.h"
 #include "app/logger/Logger.h"
 #include "app/misc/fun.hpp"
+#include "app/misc/misc.h"
 
 JNIEnv *envClosure;
 
@@ -88,6 +89,17 @@ void loadBitmap(const v8::FunctionCallbackInfo<v8::Value>& args) {
     args.GetReturnValue().Set(result);
 }
 
+void loadString(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
+    jmethodID m = envClosure->GetStaticMethodID(cl, "loadString", "(Ljava/lang/String;)Ljava/lang/String;");
+    v8::String::Utf8Value jsArg0(args.GetIsolate(), args[0]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+    jstring jArg0 = envClosure->NewStringUTF(*jsArg0);
+    auto jResult = static_cast<jstring>(envClosure->CallStaticObjectMethod(cl, m, jArg0));
+    std::string cResult = jstring2string(envClosure, jResult);
+    v8::Local<v8::String> jsString = v8::String::NewFromUtf8(args.GetIsolate(), cResult.c_str()).ToLocalChecked();
+    args.GetReturnValue().Set(jsString);
+}
+
 void texImage2D_6(const v8::FunctionCallbackInfo<v8::Value>& args) {
     int target = getIntParameter(args,0);
     int level = getIntParameter(args,1);;
@@ -107,6 +119,7 @@ void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::C
             {"setSurfaceHeight", setSurfaceHeight},
             {"getSurfaceHeight", getSurfaceHeight},
             {"_loadBitmap", loadBitmap},
+            {"_loadString", loadString},
             {"_texImage2D_6", texImage2D_6},
     };
 
