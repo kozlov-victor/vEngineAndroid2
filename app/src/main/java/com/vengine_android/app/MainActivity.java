@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Logger.info("----activity on create------------");
         super.onCreate(savedInstanceState);
+        App.mainActivity = this;
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -29,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         int heightPixels = metrics.heightPixels;
         int min = Math.min(widthPixels, heightPixels);
         App.surfaceResizer.setSize(min,min);
-        //FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
     }
 
 

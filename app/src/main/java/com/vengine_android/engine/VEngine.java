@@ -1,5 +1,6 @@
 package com.vengine_android.engine;
 
+import android.app.AlertDialog;
 import android.opengl.GLUtils;
 
 import com.vengine_android.app.App;
@@ -20,6 +21,7 @@ public class VEngine {
     public static native JsCompilationResult compileScript(String fileName, String source);
     public static native void updateFrame();
 
+    public static native void onResize(int width, int height);
 
     public static native void dispose();
 
@@ -56,6 +58,18 @@ public class VEngine {
     @JniAccess
     public static void getBitmap(int target, int level ,int bitmap) {
         GLUtils.texImage2D(target,level,App.assets.getCachedBitmap(bitmap),0);
+    }
+
+    @JniAccess
+    public static void alert(String msg) {
+        App.mainActivity.runOnUiThread(()->{
+            new AlertDialog.Builder(App.mainActivity)
+            .setMessage(msg).setPositiveButton("Ok",(dialogInterface, i) -> {
+                dialogInterface.dismiss();
+            })
+            .create()
+            .show();
+        });
     }
 
 }

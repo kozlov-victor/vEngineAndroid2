@@ -24,6 +24,7 @@ public:
       void initGlobalObjects(JNIEnv *env) const;
       JsCompilationResult compileScript(const char* fileName, const char* code) const;
       void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]) const;
+      void onResize(int width, int height) const;
 };
 
 

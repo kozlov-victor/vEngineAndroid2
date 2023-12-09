@@ -68,8 +68,10 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl10) {
         VEngine.updateFrame();
         if (resizeRequested) {
-            applyScreenSize();
-            compileInlineScript("_triggerEvent('resize');");
+            DisplayMetrics metrics = App.getContext().getResources().getDisplayMetrics();
+            int widthPixels = metrics.widthPixels;
+            int heightPixels = metrics.heightPixels;
+            VEngine.onResize(widthPixels, heightPixels);
             resizeRequested = false;
         }
         fpsCounter.logFrame();

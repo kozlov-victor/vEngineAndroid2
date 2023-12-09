@@ -165,6 +165,31 @@ void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[
     }
 }
 
+void Js::onResize(int width, int height) const {
+    v8::Isolate::Scope isolate_scope(isolate);
+    v8::HandleScope handle_scope(isolate);
+    v8::Handle<v8::Context> context_local =
+            v8::Local<v8::Context>::New(isolate, persistentContext->Get(isolate));
+    v8::Context::Scope context_scope(context_local);
+    v8::TryCatch tryCatch(isolate);
+
+    context_local->Global()->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate,"innerWidth").ToLocalChecked(),
+        v8::Integer::New(isolate,width)
+    ).Check();
+    context_local->Global()->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate,"innerHeight").ToLocalChecked(),
+        v8::Integer::New(isolate,height)
+    ).Check();
+
+    v8::Local<v8::Value> args[] = {
+            v8::String::NewFromUtf8(isolate,"resize").ToLocalChecked()
+    };
+    callFunc("_triggerEvent",1,args);
+}
+
 Js::~Js() {
     isolate->Dispose();
     v8::V8::Dispose();

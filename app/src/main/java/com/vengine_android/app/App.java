@@ -13,6 +13,7 @@ import com.vengine_android.utils.SurfaceResizer;
 public class App extends Application {
 
     public static EngineGLRenderer engineGLRenderer = new EngineGLRenderer();
+    public static MainActivity mainActivity;
     public static EngineGLSurfaceView surfaceView;
     public static SurfaceResizer surfaceResizer = new SurfaceResizer();
     public static Assets assets = new Assets();

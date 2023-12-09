@@ -39,6 +39,13 @@ Java_com_vengine_1android_engine_VEngine_updateFrame(JNIEnv *env, jclass clazz) 
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_vengine_1android_engine_VEngine_onResize(JNIEnv *env, jclass clazz, jint width,
+                                                  jint height) {
+    js->onResize(width,height);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_vengine_1android_engine_VEngine_dispose(JNIEnv *env, jclass clazz) {
     delete js;
     js = nullptr;

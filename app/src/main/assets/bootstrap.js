@@ -17,7 +17,7 @@ _globalGL.texImage2D = (...args)=>{
     else throw new Error('wrong arguments for texImage2D invocation');
 }
 
-alert = (err)=>console.error(err);
+alert = (msg)=>_external._alert(msg);
 
 //const glNameByName = {};
 //Object.keys(_globalGL).forEach(key=>{
