@@ -100,17 +100,22 @@ public class TouchSurfaceDelegate {
             //v8Arguments.add("0",touchEvent.prepareAndGetNativeObject());
             //((V8Function)(globalCanvas.getObject(touchEvent.getEventName()))).call(runtime,v8Arguments);
 
-            VEngine.compileScript("<inline>",
-                "_globalGL.canvas['"+touchEvent.getEventName()+"']"+
-                        "(" +
-                        "{" +
-                        "   preventDefault:()=>{}," +
-                        "   touches:[{clientX:"+touchEvent.getClientX()+",clientY:"+touchEvent.getClientY()+",pointerId:"+touchEvent.getPointerId()+"}]," +
-                        "   changedTouches:[{clientX:"+touchEvent.getClientX()+",clientY:"+touchEvent.getClientY()+",pointerId:"+touchEvent.getPointerId()+"}]" +
-                        "}" +
-                        ");"
+//            VEngine.compileScript("<inline>",
+//                "_globalGL.canvas['"+touchEvent.getEventName()+"']"+
+//                        "(" +
+//                        "{" +
+//                        "   preventDefault:()=>{}," +
+//                        "   touches:[{clientX:"+touchEvent.getClientX()+",clientY:"+touchEvent.getClientY()+",pointerId:"+touchEvent.getPointerId()+"}]," +
+//                        "   changedTouches:[{clientX:"+touchEvent.getClientX()+",clientY:"+touchEvent.getClientY()+",pointerId:"+touchEvent.getPointerId()+"}]" +
+//                        "}" +
+//                        ");"
+//            );
+            VEngine.onTouchEvent(
+                touchEvent.getEventName(),
+                touchEvent.getClientX(),
+                touchEvent.getClientY(),
+                touchEvent.getPointerId()
             );
-
             touchEvent.markAsClean();
         }
         this.clean = true;

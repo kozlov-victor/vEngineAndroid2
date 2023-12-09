@@ -155,8 +155,8 @@ void Js::callFunc(const char *funcname,const int argc,v8::Local<v8::Value> argv[
     v8::TryCatch tryCatch(isolate);
 
     v8::Local<v8::Object> fn_value =
-            context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, funcname).ToLocalChecked()).
-                    ToLocalChecked().As<v8::Object>();
+        context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, funcname).ToLocalChecked()).
+        ToLocalChecked().As<v8::Object>();
 
     v8::MaybeLocal<v8::Value> result =
             fn_value->CallAsFunction(context_local, context_local->Global(), argc, argv);
@@ -184,13 +184,78 @@ void Js::onResize(int width, int height) const {
         v8::Integer::New(isolate,height)
     ).Check();
 
-    v8::Local<v8::Value> args[] = {
-            v8::String::NewFromUtf8(isolate,"resize").ToLocalChecked()
+    v8::Local<v8::Value> argv[] = {
+        v8::String::NewFromUtf8(isolate,"resize").ToLocalChecked()
     };
-    callFunc("_triggerEvent",1,args);
+    callFunc("_triggerEvent",1,argv);
 }
 
-void Js::onTouchEvent(const char *name, float x, float y, int id) const {
+void Js::onTouchEvent(const char *event_name, float x, float y, int id) const {
+    v8::Isolate::Scope isolate_scope(isolate);
+    v8::HandleScope handle_scope(isolate);
+    v8::Handle<v8::Context> context_local =
+            v8::Local<v8::Context>::New(isolate, persistentContext->Get(isolate));
+    v8::Context::Scope context_scope(context_local);
+    v8::TryCatch tryCatch(isolate);
+
+    v8::Local<v8::Object> globalGl =
+        context_local->Global()->Get(context_local, v8::String::NewFromUtf8(isolate, "_globalGL").ToLocalChecked()).
+        ToLocalChecked().As<v8::Object>();
+    v8::Local<v8::Object> canvas =
+            globalGl->Get(context_local, v8::String::NewFromUtf8(isolate, "canvas").ToLocalChecked()).
+            ToLocalChecked().As<v8::Object>();
+    v8::Local<v8::Object> event_fn =
+        canvas->Get(context_local, v8::String::NewFromUtf8(isolate, event_name).ToLocalChecked()).
+        ToLocalChecked().As<v8::Object>();
+
+    if (!event_fn->IsFunction()) {
+        Logger::error("not a function");
+        Logger::error(event_name);
+        return;
+    };
+
+    v8::Local<v8::Object> touch_object = v8::Object::New(isolate);
+    touch_object->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "clientX").ToLocalChecked(),
+        v8::Number::New(isolate,x)
+    ).Check();
+    touch_object->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "clientY").ToLocalChecked(),
+        v8::Number::New(isolate,y)
+    ).Check();
+    touch_object->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "pointerId").ToLocalChecked(),
+        v8::Integer::New(isolate,id)
+    ).Check();
+    v8::Local<v8::Array> touche_object_array = v8::Array::New(isolate, 1);
+    touche_object_array->Set(context_local, 0, touch_object).Check();
+
+    v8::Local<v8::Object> event = v8::Object::New(isolate);
+    event->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "preventDefault").ToLocalChecked(),
+        v8::Function::New(context_local,[](auto){}).ToLocalChecked()
+    ).Check();
+    event->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "touches").ToLocalChecked(),
+        touche_object_array
+    ).Check();
+    event->Set(
+        context_local,
+        v8::String::NewFromUtf8(isolate, "changedTouches").ToLocalChecked(),
+        touche_object_array
+    ).Check();
+
+    v8::Local<v8::Value> argv[] = {event};
+    v8::MaybeLocal<v8::Value> result =
+        event_fn->CallAsFunction(context_local, context_local->Global(), 1, argv);
+    if (result.IsEmpty()) {
+        reportError(isolate,tryCatch,context_local,"function call error");
+    }
 
 }
 
