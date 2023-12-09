@@ -190,6 +190,10 @@ void Js::onResize(int width, int height) const {
     callFunc("_triggerEvent",1,args);
 }
 
+void Js::onTouchEvent(const char *name, float x, float y, int id) const {
+
+}
+
 Js::~Js() {
     isolate->Dispose();
     v8::V8::Dispose();

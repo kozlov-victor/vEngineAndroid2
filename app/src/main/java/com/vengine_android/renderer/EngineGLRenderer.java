@@ -18,16 +18,16 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     private boolean surfaceAlreadyCreated = false;
     private boolean resizeRequested = false;
 
-    private void compileScriptFromLocalUrl(String assetFileName) {
-        JsCompilationResult result = VEngine.compileScriptFromLocalUrl(assetFileName);
+    private void compileScriptFromLocalUrl(String assetUrl) {
+        JsCompilationResult result = VEngine.compileScriptFromLocalUrl(assetUrl);
         if (!result.isSuccess()) {
             VEngine.dispose();
             throw new RuntimeException("js error: \n"+result.getError());
         }
     }
 
-    private void compileScriptFromUrl(String assetFileName) {
-        JsCompilationResult result = VEngine.compileScriptFromUrl(assetFileName);
+    private void compileScriptFromUrl(String url) {
+        JsCompilationResult result = VEngine.compileScriptFromUrl(url);
         if (!result.isSuccess()) {
             VEngine.dispose();
             throw new RuntimeException("js error: \n"+result.getError());
@@ -83,6 +83,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
             VEngine.onResize(widthPixels, heightPixels);
             resizeRequested = false;
         }
-        fpsCounter.logFrame();
+        App.touchSurfaceDelegate.updateFrame();
+        fpsCounter.updateFrame();
     }
 }

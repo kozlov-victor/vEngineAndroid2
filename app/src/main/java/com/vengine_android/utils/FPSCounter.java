@@ -6,7 +6,7 @@ public class FPSCounter {
     private long startTime = System.nanoTime();
     private int frames = 0;
 
-    public void logFrame() {
+    public void updateFrame() {
         frames++;
         if(System.nanoTime() - startTime >= 1000000000) {
             Log.d("FPSCounter", "fps: " + frames);

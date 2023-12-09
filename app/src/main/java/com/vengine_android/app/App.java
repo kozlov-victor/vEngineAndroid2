@@ -8,12 +8,15 @@ import android.widget.Toast;
 import com.vengine_android.assets.Assets;
 import com.vengine_android.renderer.EngineGLRenderer;
 import com.vengine_android.renderer.EngineGLSurfaceView;
+import com.vengine_android.touch.TouchSurfaceDelegate;
 import com.vengine_android.utils.SurfaceResizer;
 
 public class App extends Application {
 
     public static EngineGLRenderer engineGLRenderer = new EngineGLRenderer();
     public static MainActivity mainActivity;
+
+    public static TouchSurfaceDelegate touchSurfaceDelegate = new TouchSurfaceDelegate();
     public static EngineGLSurfaceView surfaceView;
     public static SurfaceResizer surfaceResizer = new SurfaceResizer();
     public static Assets assets = new Assets();

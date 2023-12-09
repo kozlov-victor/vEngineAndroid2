@@ -27,6 +27,8 @@ public class VEngine {
     public static native JsCompilationResult compileScript(String fileName, String source);
     public static native void updateFrame();
 
+    public static native void onTouchEvent(String eventName, float x, float y, int id);
+
     public static native void onResize(int width, int height);
 
     public static native void dispose();

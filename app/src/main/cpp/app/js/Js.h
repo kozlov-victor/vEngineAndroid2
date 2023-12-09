@@ -25,6 +25,7 @@ public:
       JsCompilationResult compileScript(const char* fileName, const char* code) const;
       void callFunc(const char *funcname,const int argc,v8::Handle<v8::Value> argv[]) const;
       void onResize(int width, int height) const;
+      void onTouchEvent(const char* name, float x, float y, int id) const;
 };
 
 

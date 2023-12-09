@@ -39,6 +39,12 @@ Java_com_vengine_1android_engine_VEngine_updateFrame(JNIEnv *env, jclass clazz) 
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_vengine_1android_engine_VEngine_onTouchEvent(JNIEnv *env, jclass clazz, jstring event_name, jfloat x, jfloat y, jint id) {
+    js->onTouchEvent(jstring2string(env,event_name).c_str(),x,y,id);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_vengine_1android_engine_VEngine_onResize(JNIEnv *env, jclass clazz, jint width,
                                                   jint height) {
     js->onResize(width,height);

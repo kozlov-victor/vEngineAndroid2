@@ -3,7 +3,10 @@ package com.vengine_android.app;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +15,7 @@ import com.vengine_android.utils.Logger;
 import com.vengine_android.R;
 import com.vengine_android.engine.VEngine;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
         int heightPixels = metrics.heightPixels;
         int min = Math.min(widthPixels, heightPixels);
         App.surfaceResizer.setSize(min,min);
+        FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
+        frameLayout.setOnTouchListener(this);
     }
 
 
@@ -38,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         App.engineGLRenderer.requestResize();
     }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        App.touchSurfaceDelegate.onTouch(motionEvent);
+        return true;
+    }
+
+
 
     @Override
     protected void onDestroy() {
