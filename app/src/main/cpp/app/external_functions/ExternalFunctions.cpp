@@ -100,6 +100,20 @@ void loadString(const v8::FunctionCallbackInfo<v8::Value>& args) {
     args.GetReturnValue().Set(jsString);
 }
 
+void loadBinary(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
+    jmethodID m = envClosure->GetStaticMethodID(cl, "loadBinary", "(Ljava/lang/String;)Ljava/nio/ByteBuffer;");
+    v8::String::Utf8Value jsArg0(args.GetIsolate(), args[0]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+    jstring jArg0 = envClosure->NewStringUTF(*jsArg0);
+    jobject jByteBuffer = envClosure->CallStaticObjectMethod(cl, m, jArg0);
+
+    char *buf = (char*)envClosure->GetDirectBufferAddress(jByteBuffer);
+    jlong capacity = envClosure->GetDirectBufferCapacity(jByteBuffer);
+    v8::Handle<v8::ArrayBuffer> jsArrayBuffer = v8::ArrayBuffer::New(args.GetIsolate(),  capacity);
+    memcpy(jsArrayBuffer->GetContents().Data(), buf, capacity);
+    args.GetReturnValue().Set(jsArrayBuffer);
+}
+
 void alert(const v8::FunctionCallbackInfo<v8::Value>& args) {
     jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
     jmethodID m = envClosure->GetStaticMethodID(cl, "alert", "(Ljava/lang/String;)V");
@@ -128,6 +142,7 @@ void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::C
             {"getSurfaceHeight", getSurfaceHeight},
             {"_loadBitmap", loadBitmap},
             {"_loadString", loadString},
+            {"_loadBinary", loadBinary},
             {"_texImage2D_6", texImage2D_6},
             {"_alert", alert},
     };

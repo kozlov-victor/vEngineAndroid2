@@ -7,14 +7,20 @@ import com.vengine_android.app.App;
 import com.vengine_android.model.BitmapInfo;
 import com.vengine_android.model.JsCompilationResult;
 
+import java.nio.ByteBuffer;
+
 public class VEngine {
 
     static {
         System.loadLibrary("vengine_android");
     }
 
-    public static JsCompilationResult compileScriptFromAsset(String assetFileName) {
-        return compileScript(assetFileName, App.assets.readAsset(assetFileName));
+    public static JsCompilationResult compileScriptFromLocalUrl(String assetFileName) {
+        return compileScript(assetFileName, App.assets.loadStringFromLocalAsset(assetFileName));
+    }
+
+    public static JsCompilationResult compileScriptFromUrl(String url) {
+        return compileScript(url, App.assets.loadString(url));
     }
 
     public static native void initV8();
@@ -53,6 +59,11 @@ public class VEngine {
     @JniAccess
     public static String loadString(String fileName) {
         return App.assets.loadString(fileName);
+    }
+
+    @JniAccess
+    public static ByteBuffer loadBinary(String fileName) {
+        return App.assets.loadBinary(fileName);
     }
 
     @JniAccess

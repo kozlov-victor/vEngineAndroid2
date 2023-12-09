@@ -18,8 +18,16 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
     private boolean surfaceAlreadyCreated = false;
     private boolean resizeRequested = false;
 
-    private void compileScriptFromAsset(String assetFileName) {
-        JsCompilationResult result = VEngine.compileScriptFromAsset(assetFileName);
+    private void compileScriptFromLocalUrl(String assetFileName) {
+        JsCompilationResult result = VEngine.compileScriptFromLocalUrl(assetFileName);
+        if (!result.isSuccess()) {
+            VEngine.dispose();
+            throw new RuntimeException("js error: \n"+result.getError());
+        }
+    }
+
+    private void compileScriptFromUrl(String assetFileName) {
+        JsCompilationResult result = VEngine.compileScriptFromUrl(assetFileName);
         if (!result.isSuccess()) {
             VEngine.dispose();
             throw new RuntimeException("js error: \n"+result.getError());
@@ -56,8 +64,9 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         }
         VEngine.initV8();
         applyScreenSize();
-        compileScriptFromAsset("bootstrap.js");
-        compileScriptFromAsset("index7.js");
+        compileScriptFromLocalUrl("bootstrap.js");
+        App.assets.setRemoteBaseUrl("http://vakozlov.zzz.com.ua/vEngine2/");
+        compileScriptFromUrl("out/model3dFromObj6.js");
         surfaceAlreadyCreated = true;
     }
 
