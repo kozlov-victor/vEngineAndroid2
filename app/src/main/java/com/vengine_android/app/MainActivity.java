@@ -1,5 +1,6 @@
 package com.vengine_android.app;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         Logger.info("----activity on create------------");
         super.onCreate(savedInstanceState);
         App.mainActivity = this;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);

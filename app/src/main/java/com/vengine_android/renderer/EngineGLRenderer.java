@@ -66,7 +66,7 @@ public class EngineGLRenderer implements GLSurfaceView.Renderer {
         applyScreenSize();
         compileScriptFromLocalUrl("bootstrap.js");
         App.assets.setRemoteBaseUrl("http://vakozlov.zzz.com.ua/vEngine2/");
-        compileScriptFromUrl("out/model3dFromObj6.js");
+        compileScriptFromUrl("out/dudeUntitled.js");
         surfaceAlreadyCreated = true;
     }
 

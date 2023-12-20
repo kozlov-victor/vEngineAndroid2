@@ -85,35 +85,20 @@ v8::Local<v8::Object> createV8GlObjectFromId(const v8::FunctionCallbackInfo<v8::
     return obj;
 }
 
-template <typename T>
-T getParameter_(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate* isolate = args.GetIsolate();
-    if (i < 0 || i >= args.Length()) {
-        Logger::error("wrong parameter index",i);
-        return T();
-    }
-    v8::Local<v8::Value> value = args[i];
-    if (!value->IsNumber()) {
-        Logger::error("not a numeric parameter");
-        return T();
-    }
-    return static_cast<T>(value->ToNumber(isolate->GetCurrentContext()).ToLocalChecked()->Value());
-}
-
 GLfloat getGlFloatParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLfloat>(args, i);
+    return getNumericParameter<GLfloat>(args, i);
 }
 
 GLbitfield getBitfieldParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLbitfield>(args, i);
+    return getNumericParameter<GLbitfield>(args, i);
 }
 
 GLuint getGlUIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLuint>(args, i);
+    return getNumericParameter<GLuint>(args, i);
 }
 
 GLint getGlIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLint>(args, i);
+    return getNumericParameter<GLint>(args, i);
 }
 
 GLboolean getGlBooleanParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
@@ -131,19 +116,19 @@ GLboolean getGlBooleanParameter(const v8::FunctionCallbackInfo<v8::Value>& args,
 }
 
 GLenum getGlEnumParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLenum>(args, i);
+    return getNumericParameter<GLenum>(args, i);
 }
 
 GLintptr getGlIntPtrParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLintptr>(args, i);
+    return getNumericParameter<GLintptr>(args, i);
 }
 
 GLsizeiptr getGlSizeParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLsizeiptr>(args, i);
+    return getNumericParameter<GLsizeiptr>(args, i);
 }
 
 GLsizei getGlSizeiParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    return getParameter_<GLsizei>(args, i);
+    return getNumericParameter<GLsizei>(args, i);
 }
 
 v8::Local<v8::ArrayBuffer> getArrayBuffer(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {

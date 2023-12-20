@@ -18,6 +18,9 @@ _globalGL.texImage2D = (...args)=>{
 }
 
 alert = (msg)=>_external._alert(msg);
+window.onerror = (e)=>{
+    console.error(e.toString());
+};
 
 //const glNameByName = {};
 //Object.keys(_globalGL).forEach(key=>{

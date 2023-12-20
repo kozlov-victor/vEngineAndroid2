@@ -1,6 +1,7 @@
 package com.vengine_android.engine;
 
 import android.app.AlertDialog;
+import android.content.pm.ActivityInfo;
 import android.opengl.GLUtils;
 
 import com.vengine_android.app.App;
@@ -82,6 +83,13 @@ public class VEngine {
             })
             .create()
             .show();
+        });
+    }
+
+    public static void setOrientation(boolean landscape) {
+        App.mainActivity.runOnUiThread(()->{
+            if (landscape) App.mainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            else App.mainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         });
     }
 

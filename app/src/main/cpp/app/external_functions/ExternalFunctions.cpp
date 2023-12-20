@@ -11,22 +11,9 @@
 
 JNIEnv *envClosure;
 
-int getIntParameter(const v8::FunctionCallbackInfo<v8::Value>& args, int i) {
-    v8::Isolate* isolate = args.GetIsolate();
-    if (i < 0 || i >= args.Length()) {
-        Logger::error("wrong parameter index",i);
-        return {};
-    }
-    v8::Local<v8::Value> value = args[i];
-    if (!value->IsNumber()) {
-        Logger::error("not a numeric parameter");
-        return {};
-    }
-    return static_cast<int>(value->ToNumber(isolate->GetCurrentContext()).ToLocalChecked()->Value());
-}
 
 void setSurfaceWidth(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    int width = getIntParameter(args,0);
+    auto width = getNumericParameter<int>(args, 0);
     jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
     jmethodID cid = envClosure->GetStaticMethodID(cl, "setSurfaceWidth", "(I)V");
     envClosure->CallStaticVoidMethod(cl, cid, width);
@@ -40,7 +27,7 @@ void getSurfaceWidth(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void setSurfaceHeight(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    int height = getIntParameter(args,0);
+    auto height = getNumericParameter<int>(args, 0);
     jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
     jmethodID cid = envClosure->GetStaticMethodID(cl, "setSurfaceHeight", "(I)V");
     envClosure->CallStaticVoidMethod(cl, cid, height);
@@ -123,9 +110,9 @@ void alert(const v8::FunctionCallbackInfo<v8::Value>& args) {
 }
 
 void texImage2D_6(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    int target = getIntParameter(args,0);
-    int level = getIntParameter(args,1);;
-    int bitmap = getIntParameter(args,5);;
+    auto target = getNumericParameter<int>(args, 0);
+    auto level = getNumericParameter<int>(args, 1);;
+    auto bitmap = getNumericParameter<int>(args, 5);;
     jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
     jmethodID m = envClosure->GetStaticMethodID(cl, "getBitmap", "(III)V");
     envClosure->CallStaticVoidMethod(cl,m,target,level,bitmap);
