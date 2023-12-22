@@ -118,6 +118,14 @@ void texImage2D_6(const v8::FunctionCallbackInfo<v8::Value>& args) {
     envClosure->CallStaticVoidMethod(cl,m,target,level,bitmap);
 }
 
+void setBgColor(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    jclass cl = envClosure->FindClass("com/vengine_android/engine/VEngine");
+    jmethodID m = envClosure->GetStaticMethodID(cl, "setBgColor", "(Ljava/lang/String;)V");
+    v8::String::Utf8Value jsArg0(args.GetIsolate(), args[0]->ToString(args.GetIsolate()->GetCurrentContext()).ToLocalChecked());
+    jstring jArg0 = envClosure->NewStringUTF(*jsArg0);
+    envClosure->CallStaticVoidMethod(cl, m, jArg0);
+}
+
 void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::Context> &context_local) {
     v8::Local<v8::Object> ext = v8::Object::New(isolate);
     envClosure = env;
@@ -132,6 +140,7 @@ void ExternalFunctions::create(JNIEnv *env,v8::Isolate *isolate, v8::Local<v8::C
             {"_loadBinary", loadBinary},
             {"_texImage2D_6", texImage2D_6},
             {"_alert", alert},
+            {"_setBgColor", setBgColor},
     };
 
     for(const Fun& f : funcs) {

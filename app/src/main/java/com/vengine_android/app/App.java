@@ -3,6 +3,7 @@ package com.vengine_android.app;
 import android.app.Application;
 import android.content.Context;
 import android.os.Looper;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.vengine_android.assets.Assets;
@@ -15,6 +16,7 @@ public class App extends Application {
 
     public static EngineGLRenderer engineGLRenderer = new EngineGLRenderer();
     public static MainActivity mainActivity;
+    public static FrameLayout frameLayout;
 
     public static TouchSurfaceDelegate touchSurfaceDelegate = new TouchSurfaceDelegate();
     public static EngineGLSurfaceView surfaceView;

@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         App.surfaceResizer.setSize(min,min);
         FrameLayout frameLayout = findViewById(R.id.engine_gl_frame_view);
         frameLayout.setOnTouchListener(this);
+        App.frameLayout = frameLayout;
     }
 
 

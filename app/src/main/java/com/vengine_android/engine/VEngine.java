@@ -2,6 +2,7 @@ package com.vengine_android.engine;
 
 import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.opengl.GLUtils;
 
 import com.vengine_android.app.App;
@@ -90,6 +91,13 @@ public class VEngine {
         App.mainActivity.runOnUiThread(()->{
             if (landscape) App.mainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             else App.mainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        });
+    }
+
+    @JniAccess
+    public static void setBgColor(String color) {
+        App.mainActivity.runOnUiThread(()->{
+            App.frameLayout.setBackgroundColor(Color.parseColor(color));
         });
     }
 

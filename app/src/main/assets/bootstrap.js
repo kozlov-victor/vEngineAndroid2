@@ -187,12 +187,26 @@ window.onerror = (e)=>{
     const globalCanvas = new Canvas();
     _globalGL.canvas = globalCanvas;
 
+    const bodyStyle = {};
+    let bValue = undefined;
+    Object.defineProperty(bodyStyle, "backgroundColor", {
+          get() {
+                return bValue;
+          },
+          set(newValue) {
+                _external._setBgColor(newValue);
+                bValue = newValue;
+          },
+          enumerable: true,
+          configurable: true,
+    });
+
     class Document {
         constructor(){
             this.body = {
                 appendChild:()=>{},
                 addEventListener:()=>{},
-                style: {}
+                style: bodyStyle
             }
         }
         createElement(val){
