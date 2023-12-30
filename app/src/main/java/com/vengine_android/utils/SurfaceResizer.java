@@ -22,7 +22,6 @@ public class SurfaceResizer {
     }
 
     public void setSize(final int width, final int height){
-        if (width==0) throw new RuntimeException("0");
         new Handler(Looper.getMainLooper()).post(()->{
             ViewGroup.LayoutParams params = App.surfaceView.getLayoutParams();
             if (width!=-1) params.width = width;
